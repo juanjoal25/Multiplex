@@ -1,0 +1,43 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Cadena/">
+    <Project Path="src/Cadena/Cadena.Api/Cadena.Api.csproj" />
+    <Project Path="src/Cadena/Cadena.Application/Cadena.Application.csproj" />
+    <Project Path="src/Cadena/Cadena.Domain/Cadena.Domain.csproj" />
+    <Project Path="src/Cadena/Cadena.Infrastructure/Cadena.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Clientes/">
+    <Project Path="src/Clientes/Clientes.Api/Clientes.Api.csproj" />
+    <Project Path="src/Clientes/Clientes.Application/Clientes.Application.csproj" />
+    <Project Path="src/Clientes/Clientes.Domain/Clientes.Domain.csproj" />
+    <Project Path="src/Clientes/Clientes.Infrastructure/Clientes.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Financiero/">
+    <Project Path="src/Financiero/Financiero.Api/Financiero.Api.csproj" />
+    <Project Path="src/Financiero/Financiero.Application/Financiero.Application.csproj" />
+    <Project Path="src/Financiero/Financiero.Domain/Financiero.Domain.csproj" />
+    <Project Path="src/Financiero/Financiero.Infrastructure/Financiero.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Infraestructura/">
+    <Project Path="src/Infraestructura/Infraestructura.Api/Infraestructura.Api.csproj" />
+    <Project Path="src/Infraestructura/Infraestructura.Application/Infraestructura.Application.csproj" />
+    <Project Path="src/Infraestructura/Infraestructura.Domain/Infraestructura.Domain.csproj" />
+    <Project Path="src/Infraestructura/Infraestructura.Infrastructure/Infraestructura.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Programacion/">
+    <Project Path="src/Programacion/Programacion.Api/Programacion.Api.csproj" />
+    <Project Path="src/Programacion/Programacion.Application/Programacion.Application.csproj" />
+    <Project Path="src/Programacion/Programacion.Domain/Programacion.Domain.csproj" />
+    <Project Path="src/Programacion/Programacion.Infrastructure/Programacion.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Messaging.Contracts/Messaging.Contracts.csproj" />
+    <Project Path="src/Shared/Shared.Kernel/Shared.Kernel.csproj" />
+  </Folder>
+  <Folder Name="/src/Ventas/">
+    <Project Path="src/Ventas/Ventas.Api/Ventas.Api.csproj" />
+    <Project Path="src/Ventas/Ventas.Application/Ventas.Application.csproj" />
+    <Project Path="src/Ventas/Ventas.Domain/Ventas.Domain.csproj" />
+    <Project Path="src/Ventas/Ventas.Infrastructure/Ventas.Infrastructure.csproj" />
+  </Folder>
+</Solution>
