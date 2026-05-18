@@ -1,0 +1,38 @@
+# .NET build artifacts
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userprefs
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.swp
+
+# Tests
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# Logs
+*.log
+logs/
+
+# Docker volumes (local)
+docker/data/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Plans (local working files)
+.claude/plans/
