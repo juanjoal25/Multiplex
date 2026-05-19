@@ -36,6 +36,9 @@ Thumbs.db
 
 # Plans (local working files)
 .claude/plans/
+.claude/worktrees/
+.claude/settings.local.json
+
 
 # BFF identity store (local SQLite)
 **/bff_identity.db
