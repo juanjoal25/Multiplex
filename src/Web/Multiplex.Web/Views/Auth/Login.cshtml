@@ -1,0 +1,61 @@
+@model LoginVm
+@{
+    ViewData["Title"] = "Iniciar Sesión — FRAME";
+    var returnUrl = ViewData["ReturnUrl"] as string;
+}
+@section Styles {
+<style>
+.auth-layout{min-height:calc(100vh - 70px);display:grid;grid-template-columns:1fr 1fr}
+.auth-panel{padding:72px 64px;display:flex;flex-direction:column;justify-content:center}
+.auth-visual{background:var(--black);position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:56px}
+.av-scan{position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(196,26,26,.04) 0px,rgba(196,26,26,.04) 1px,transparent 1px,transparent 3px)}
+.av-band{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red)}
+.av-title{font-family:var(--fd);font-size:96px;line-height:.88;color:var(--cream);position:relative;z-index:1;text-transform:uppercase}
+.av-title em{color:var(--red);font-style:normal;display:block}
+.av-quote{font-family:var(--fs);font-style:italic;font-size:16px;color:var(--paper);margin-top:20px;line-height:1.5;max-width:320px;position:relative;z-index:1}
+.auth-logo{font-family:var(--fd);font-size:32px;color:var(--black);margin-bottom:40px}
+.auth-logo span{color:var(--red)}
+.auth-title{font-family:var(--fd);font-size:52px;color:var(--black);text-transform:uppercase;line-height:.92;margin-bottom:8px}
+.auth-sub{font-family:var(--fm);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--house);margin-bottom:40px}
+.divider-text{display:flex;align-items:center;gap:12px;color:var(--house);font-family:var(--fm);font-size:9px;letter-spacing:.2em;text-transform:uppercase;margin:24px 0}
+.divider-text::before,.divider-text::after{content:'';flex:1;height:.5px;background:var(--paper)}
+@@media(max-width:768px){.auth-layout{grid-template-columns:1fr}.auth-visual{display:none}.auth-panel{padding:40px 24px}}
+</style>
+}
+
+<div class="auth-layout">
+  <div class="auth-panel">
+    <div class="auth-logo">FRAME<span>·</span></div>
+    <div class="auth-title">Bienvenido<br>de vuelta</div>
+    <div class="auth-sub">Accede a tu cuenta de espectador</div>
+
+    <form method="post" asp-action="Login" asp-route-returnUrl="@returnUrl">
+      @Html.AntiForgeryToken()
+      <div asp-validation-summary="ModelOnly" class="form-error" style="margin-bottom:16px"></div>
+      <div class="form-field">
+        <label class="form-label">Correo electrónico</label>
+        <input asp-for="Email" class="form-input" type="email" placeholder="hola@correo.com" required />
+        <span asp-validation-for="Email" class="form-help form-error"></span>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Contraseña</label>
+        <input asp-for="Password" class="form-input" type="password" placeholder="••••••••" required />
+        <span asp-validation-for="Password" class="form-help form-error"></span>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:8px">Iniciar Sesión</button>
+    </form>
+
+    <div class="divider-text">o</div>
+    <div style="text-align:center;font-family:var(--fm);font-size:11px;color:var(--house)">
+      ¿No tienes cuenta? <a asp-action="Registro" style="color:var(--red);text-decoration:none;border-bottom:1px solid currentColor">Regístrate gratis</a>
+    </div>
+  </div>
+  <div class="auth-visual">
+    <div class="av-scan"></div>
+    <div class="av-band"></div>
+    <div>
+      <div class="av-title">La<br>Función<br><em>comienza</em><br>contigo</div>
+      <div class="av-quote">"El cine es un espejo en el que a menudo nos vemos a nosotros mismos."</div>
+    </div>
+  </div>
+</div>

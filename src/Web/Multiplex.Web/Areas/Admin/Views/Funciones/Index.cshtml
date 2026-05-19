@@ -1,0 +1,101 @@
+@model FuncionesVm
+@{
+    ViewData["Title"] = "Funciones — Admin FRAME";
+    ViewData["AdminActive"] = "funciones";
+}
+@section Styles {
+<style>
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--black);border:1px solid var(--void);padding:36px;width:640px;max-height:90vh;overflow-y:auto;border-top:3px solid var(--red)}
+.modal-title{font-family:var(--fd);font-size:32px;color:var(--cream);text-transform:uppercase;margin-bottom:24px}
+</style>
+}
+
+<div class="admin-page-header">
+  <div>
+    <div class="admin-eyebrow">// Programación</div>
+    <div class="admin-page-title">Funciones</div>
+  </div>
+  <button class="btn btn-primary btn-sm" data-modal-open="modalNuevaFuncion">+ Nueva función</button>
+</div>
+
+@if (Model.Funciones.Count == 0)
+{
+  <div class="alert alert-cream" style="margin-bottom:20px"><span class="alert-icon">›</span><div class="alert-msg">No hay funciones programadas. Crea la primera.</div></div>
+}
+else
+{
+  <table class="data-table">
+    <thead><tr><th>Inicio</th><th>Fin</th><th>Sala</th><th>Formato</th><th>ID</th><th>Acciones</th></tr></thead>
+    <tbody>
+      @foreach (var f in Model.Funciones.OrderBy(x => x.Inicio))
+      {
+        <tr>
+          <td>@f.Inicio.ToLocalTime().ToString("dd MMM yyyy · HH:mm")</td>
+          <td>@f.Fin.ToLocalTime().ToString("HH:mm")</td>
+          <td>@f.IdSala.ToString().Substring(0, 8)</td>
+          <td><span class="tag tag-red">@f.Formato</span></td>
+          <td style="font-family:var(--fm);font-size:10px;color:var(--house)">@f.Id.ToString().Substring(0, 12)</td>
+          <td>
+            <form method="post" asp-action="Cancelar" asp-route-id="@f.Id" style="margin:0">
+              @Html.AntiForgeryToken()
+              <input type="hidden" name="motivo" value="Cancelación administrativa" />
+              <button type="submit" class="tbl-btn danger">Cancelar</button>
+            </form>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
+
+<div class="modal-overlay" id="modalNuevaFuncion">
+  <div class="modal">
+    <div class="modal-title">Nueva función</div>
+    <form method="post" asp-action="Nueva">
+      @Html.AntiForgeryToken()
+      <div class="form-field">
+        <label class="form-label" style="color:var(--house)">Película</label>
+        <select name="IdPelicula" class="form-select" style="background-color:var(--void);color:var(--cream);border-color:var(--shadow)" required>
+          @foreach (var p in Model.Peliculas)
+          {
+            <option value="@p.Id">@p.Titulo</option>
+          }
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label" style="color:var(--house)">Sala</label>
+        <select name="IdSala" class="form-select" style="background-color:var(--void);color:var(--cream);border-color:var(--shadow)" required>
+          @foreach (var s in Model.Salas)
+          {
+            <option value="@s.Id">@s.Nombre — @s.Tipo</option>
+          }
+        </select>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label class="form-label" style="color:var(--house)">Inicio</label>
+          <input class="form-input dark" name="Inicio" type="datetime-local" required />
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="color:var(--house)">Fin</label>
+          <input class="form-input dark" name="Fin" type="datetime-local" required />
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label" style="color:var(--house)">Formato</label>
+        <select name="Formato" class="form-select" style="background-color:var(--void);color:var(--cream);border-color:var(--shadow)">
+          @foreach (TipoFormato f in Enum.GetValues<TipoFormato>())
+          {
+            <option value="@f">@f</option>
+          }
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:24px;justify-content:flex-end">
+        <button type="button" class="btn btn-outline-light" data-modal-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">Programar</button>
+      </div>
+    </form>
+  </div>
+</div>

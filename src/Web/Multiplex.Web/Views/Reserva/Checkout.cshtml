@@ -1,0 +1,105 @@
+@model CheckoutVm
+@{
+    ViewData["Title"] = "Pago — FRAME";
+    var co = System.Globalization.CultureInfo.GetCultureInfo("es-CO");
+    var descuento = Math.Round(Model.Cart.Subtotal * Model.DescuentoPct / 100m, 0);
+    var total = Model.Cart.Subtotal - descuento;
+}
+@section Styles {
+<style>
+.main-inner{max-width:1280px;margin:0 auto;padding:48px 40px;display:grid;grid-template-columns:1fr 340px;gap:36px;align-items:start}
+.checkout-block{background:var(--cream-warm);border:.5px solid var(--paper);padding:24px;margin-bottom:18px}
+.checkout-block h3{font-family:var(--fd);font-size:22px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px}
+.method-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.method-pill{flex:1;padding:14px;border:.5px solid var(--paper);font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;text-align:center;cursor:pointer;background:transparent;color:var(--house)}
+.method-pill input{display:none}
+.method-pill.selected{border-color:var(--red);color:var(--red)}
+.steps-bar{display:flex;gap:0;align-items:center;margin-bottom:24px}
+@@media(max-width:900px){.main-inner{grid-template-columns:1fr}}
+</style>
+}
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="t-label" style="margin-bottom:8px">// Paso 3 · Pago</div>
+    <div style="font-family:var(--fd);font-size:64px;color:var(--cream);text-transform:uppercase;line-height:.9">Checkout</div>
+    <div class="steps-bar" style="margin-top:20px">
+      <div class="step done"><div class="step-num">1</div><span>Sillas</span></div>
+      <div class="step-sep"></div>
+      <div class="step done"><div class="step-num">2</div><span>Confitería</span></div>
+      <div class="step-sep"></div>
+      <div class="step active"><div class="step-num">3</div><span>Pago</span></div>
+    </div>
+  </div>
+</div>
+<partial name="_Filmstrip" />
+
+<form method="post" asp-action="Checkout">
+  @Html.AntiForgeryToken()
+  <div class="main-inner">
+    <div>
+      @if (Model.DescuentoPct > 0)
+      {
+        <div class="alert alert-cream" style="margin-bottom:18px">
+          <span class="alert-icon">★</span>
+          <div class="alert-msg">Plan <strong>@Model.Nivel</strong>: descuento de @Model.DescuentoPct.ToString("0")% aplicado (@descuento.ToString("C0", co)).</div>
+        </div>
+      }
+
+      <div class="checkout-block">
+        <h3>Método de pago</h3>
+        <div class="method-row">
+          @foreach (MetodoPago m in Enum.GetValues<MetodoPago>())
+          {
+            <label class="method-pill@(m == MetodoPago.TarjetaCredito ? " selected" : "")">
+              <input type="radio" name="MetodoPago" value="@m" @(m == MetodoPago.TarjetaCredito ? "checked" : "") onchange="document.querySelectorAll('.method-pill').forEach(p=>p.classList.remove('selected'));this.closest('.method-pill').classList.add('selected')" />
+              @(m switch
+              {
+                  MetodoPago.TarjetaCredito => "Tarjeta crédito",
+                  MetodoPago.TarjetaDebito => "Tarjeta débito",
+                  MetodoPago.EfectivoTaquilla => "Efectivo taquilla",
+                  MetodoPago.BilleteraDigital => "Billetera digital",
+                  _ => m.ToString()
+              })
+            </label>
+          }
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Nombre en la tarjeta</label>
+            <input name="NombreTarjeta" class="form-input" type="text" placeholder="Como aparece en la tarjeta" />
+          </div>
+          <div class="form-field">
+            <label class="form-label">Número de tarjeta</label>
+            <input name="NumeroTarjeta" class="form-input" type="text" inputmode="numeric" maxlength="19" placeholder="•••• •••• •••• ••••" />
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Vencimiento</label>
+            <input name="Vencimiento" class="form-input" type="text" placeholder="MM/AA" />
+          </div>
+          <div class="form-field">
+            <label class="form-label">CVV</label>
+            <input name="Cvv" class="form-input" type="text" inputmode="numeric" maxlength="4" placeholder="•••" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <div class="summary-box">
+        <div class="summary-title">Resumen final</div>
+        <div class="summary-row"><div class="summary-key">Boletas (@Model.Cart.Sillas.Count)</div><div class="summary-val">@Model.Cart.SubtotalBoletas.ToString("C0", co)</div></div>
+        <div class="summary-row"><div class="summary-key">Confitería</div><div class="summary-val">@Model.Cart.SubtotalConfiteria.ToString("C0", co)</div></div>
+        @if (descuento > 0)
+        {
+          <div class="summary-row"><div class="summary-key">Descuento</div><div class="summary-val" style="color:var(--red)">-@descuento.ToString("C0", co)</div></div>
+        }
+        <div class="summary-row summary-total"><div class="summary-key">Total a pagar</div><div class="summary-val">@total.ToString("C0", co)</div></div>
+        <button type="submit" class="btn btn-primary btn-full" style="margin-top:20px">Pagar @total.ToString("C0", co)</button>
+      </div>
+    </aside>
+  </div>
+</form>

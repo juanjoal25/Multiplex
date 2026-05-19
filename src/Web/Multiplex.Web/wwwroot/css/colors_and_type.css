@@ -1,0 +1,272 @@
+/* ============================================================
+   FRAME — Colors & Typography
+   ------------------------------------------------------------
+   A brutally limited palette: pure black, off-white cream,
+   blood red. Massive display type set tight; mono for the
+   small-print "ticket-counter" voice; italic serif for the
+   cinematic asides. Grain everywhere.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=DM+Serif+Display:ital@0;1&display=swap');
+
+:root {
+  /* ────────  CORE PALETTE  ──────── */
+  --frame-black:        #0D0C0B;   /* Projection Black — backgrounds, ink */
+  --frame-red:          #C41A1A;   /* Crimson Lead — primary accent, danger, energy */
+  --frame-cream:        #F2EDE6;   /* Silver Screen — paper, light surface */
+
+  /* ────────  EXTENDED PALETTE  ──────── */
+  --frame-red-dark:     #8B0F0F;   /* Dark House — pressed states, deep red */
+  --frame-red-muted:    #7A2020;   /* Velvet — sold-out, disabled red */
+  --frame-cream-warm:   #E8E1D6;   /* Warm Cream — secondary paper */
+  --frame-paper-aged:   #C8C0B4;   /* Aged Paper — hairlines, dividers */
+  --frame-shadow:       #3A3732;   /* Reel Shadow — dark UI on cream */
+  --frame-house-light:  #6B6560;   /* Dim House — muted body text */
+  --frame-void:         #2A2722;   /* Void — near-black on dark UI */
+
+  /* ────────  SEMANTIC FG / BG  ──────── */
+  --fg-1:   var(--frame-black);          /* primary text on cream */
+  --fg-2:   var(--frame-shadow);         /* secondary text on cream */
+  --fg-3:   var(--frame-house-light);    /* tertiary / captions */
+  --fg-accent: var(--frame-red);         /* attention */
+  --fg-on-dark-1: var(--frame-cream);
+  --fg-on-dark-2: var(--frame-paper-aged);
+  --fg-on-dark-3: var(--frame-house-light);
+
+  --bg-1:   var(--frame-cream);          /* page */
+  --bg-2:   var(--frame-cream-warm);     /* card / surface */
+  --bg-3:   var(--frame-paper-aged);     /* recessed */
+  --bg-ink: var(--frame-black);          /* dark UI panel */
+  --bg-stage: var(--frame-void);         /* deeper than black */
+
+  --border:        var(--frame-paper-aged);
+  --border-strong: var(--frame-black);
+  --border-on-dark: var(--frame-shadow);
+
+  --status-danger:  var(--frame-red);
+  --status-warn:    var(--frame-red);
+  --status-ok:      var(--frame-black);    /* no green — we use ink */
+  --status-sold:    var(--frame-red-muted);
+
+  /* ────────  TYPOGRAPHY FAMILIES  ──────── */
+  --font-display: 'Bebas Neue', 'Oswald', 'Anton', 'Arial Narrow', sans-serif;
+  --font-mono:    'Space Mono', 'IBM Plex Mono', ui-monospace, monospace;
+  --font-serif:   'DM Serif Display', 'Playfair Display', Georgia, serif;
+
+  /* ────────  TYPE SCALE  ──────── */
+  /* Display — Bebas Neue, tight LH, slight tracking. Set in UPPERCASE. */
+  --t-mega:      clamp(96px, 14vw, 200px);   /* hero / poster bleed */
+  --t-display:   clamp(64px, 8vw, 120px);    /* page openers */
+  --t-h1:        72px;
+  --t-h2:        48px;
+  --t-h3:        32px;
+  --t-h4:        22px;
+
+  /* Serif — italic, sparingly. Quotes, asides, "cinematic" voice. */
+  --t-serif-lg:  32px;
+  --t-serif-md:  22px;
+
+  /* Mono — body, metadata, ticket print. */
+  --t-body:      14px;
+  --t-body-sm:   12px;
+  --t-caption:   10px;
+  --t-label:     9px;          /* 0.3em tracking, uppercase */
+
+  /* ────────  LINE HEIGHTS  ──────── */
+  --lh-tight:   0.88;          /* mega + display */
+  --lh-snug:    1.0;
+  --lh-normal:  1.4;
+  --lh-body:    1.7;           /* mono reads better loose */
+
+  /* ────────  TRACKING  ──────── */
+  --tr-display:  0.01em;
+  --tr-label:    0.3em;        /* the FRAME signature: HUGE tracking on small caps */
+  --tr-eyebrow:  0.25em;
+  --tr-tag:      0.2em;
+  --tr-meta:     0.15em;
+
+  /* ────────  SPACING SCALE  ──────── */
+  --sp-xs:    4px;
+  --sp-sm:    8px;
+  --sp-md:    12px;
+  --sp-base:  16px;
+  --sp-lg:    24px;
+  --sp-xl:    32px;
+  --sp-2xl:   48px;
+  --sp-3xl:   64px;
+  --sp-4xl:   96px;
+
+  /* ────────  RADII  ──────── */
+  /* FRAME is brutalist: 0px is the rule. 2px exists for chips only. */
+  --r-none: 0px;
+  --r-chip: 2px;
+  --r-pill: 999px;             /* reserved for member badges */
+
+  /* ────────  BORDERS / RULES  ──────── */
+  --rule-hairline: 0.5px solid var(--border);
+  --rule-strong:   1px solid var(--border-strong);
+  --rule-red:      2px solid var(--frame-red);
+  --rule-red-thick: 4px solid var(--frame-red);
+
+  /* ────────  ELEVATION  ──────── */
+  /* FRAME barely uses shadows; it uses BLACK BLOCKS and OFFSET STACKING. */
+  --shadow-stamp:  4px 4px 0 var(--frame-black);     /* hard offset */
+  --shadow-stamp-red: 6px 6px 0 var(--frame-red);
+  --shadow-press:  inset 0 0 0 2px var(--frame-black);
+
+  /* ────────  GRAIN OVERLAY  ──────── */
+  --grain-opacity: 0.05;
+
+  /* ────────  MOTION  ──────── */
+  --ease-cut:    cubic-bezier(0.2, 0, 0, 1);   /* film cut */
+  --ease-pan:    cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast:    120ms;
+  --dur-base:    200ms;
+  --dur-slow:    400ms;
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT STYLES
+   ============================================================ */
+
+html, body {
+  background: var(--bg-1);
+  color: var(--fg-1);
+  font-family: var(--font-mono);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.frame-mega,
+h1.display {
+  font-family: var(--font-display);
+  font-size: var(--t-mega);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tr-display);
+  text-transform: uppercase;
+  color: var(--fg-1);
+  margin: 0;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: var(--t-h1);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tr-display);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-size: var(--t-h2);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tr-display);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+h3 {
+  font-family: var(--font-display);
+  font-size: var(--t-h3);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tr-display);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+h4, .frame-h4 {
+  font-family: var(--font-display);
+  font-size: var(--t-h4);
+  line-height: var(--lh-snug);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+p, .frame-body {
+  font-family: var(--font-mono);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  color: var(--fg-1);
+  margin: 0;
+}
+
+.frame-quote, blockquote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--t-serif-lg);
+  line-height: 1.2;
+  color: var(--fg-1);
+  margin: 0;
+}
+
+.frame-caption {
+  font-family: var(--font-mono);
+  font-size: var(--t-caption);
+  letter-spacing: var(--tr-meta);
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.frame-label,
+.frame-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--fg-accent);
+  font-weight: 400;
+}
+
+.frame-meta {
+  font-family: var(--font-mono);
+  font-size: var(--t-caption);
+  letter-spacing: var(--tr-tag);
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: var(--t-body-sm);
+  background: var(--bg-2);
+  padding: 1px 6px;
+  border: var(--rule-hairline);
+}
+
+a { color: var(--fg-accent); text-decoration: none; border-bottom: 1px solid currentColor; }
+a:hover { opacity: 0.7; }
+
+/* ────────  GRAIN OVERLAY  ──────── */
+.frame-grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: var(--grain-opacity);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+
+/* ────────  DUOTONE FILTERS  ──────── */
+/* Apply to <img> to get the signature red+black duotone treatment */
+.frame-duotone-red {
+  filter: grayscale(1) contrast(1.3) brightness(0.85);
+  mix-blend-mode: multiply;
+  background: var(--frame-red);
+}
+.frame-duotone-red-wrap {
+  background: var(--frame-red);
+  overflow: hidden;
+}
+.frame-duotone-red-wrap > img {
+  filter: grayscale(1) contrast(1.2);
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

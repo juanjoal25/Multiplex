@@ -1,0 +1,109 @@
+@{
+    var isAuth = User?.Identity?.IsAuthenticated ?? false;
+    var displayName = User?.GetDisplayName();
+    var nivel = User?.GetNivel();
+    var active = ViewData["NavActive"] as string ?? "cartelera";
+    string NavCls(string key) => key == active ? "nav-link active" : "nav-link";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>@(ViewData["Title"] ?? "FRAME Multiplex")</title>
+  <link rel="stylesheet" href="~/css/colors_and_type.css" />
+  <link rel="stylesheet" href="~/css/style.css" />
+  @RenderSection("Styles", required: false)
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a asp-controller="Home" asp-action="Index" class="nav-logo">FRAME<span>·</span></a>
+    <div class="nav-links">
+      <a asp-controller="Home" asp-action="Index" class="@NavCls("cartelera")">Cartelera</a>
+      <a asp-controller="Home" asp-action="Proximamente" class="@NavCls("proximamente")">Próximamente</a>
+      <a asp-controller="Alquiler" asp-action="Index" class="@NavCls("alquiler")">Eventos</a>
+      <a asp-controller="Membresia" asp-action="Index" class="@NavCls("membresia")">Membresía</a>
+    </div>
+    <div class="nav-right">
+      @if (isAuth && User!.IsInRole("ADMIN"))
+      {
+        <a asp-area="Admin" asp-controller="Peliculas" asp-action="Index" class="nav-action">Admin</a>
+      }
+      @if (isAuth)
+      {
+        <a asp-controller="Perfil" asp-action="Index" class="nav-action" title="@displayName">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="8" cy="5.5" r="2.5"/><path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/>
+          </svg>
+          @(displayName ?? "Cuenta")
+        </a>
+        <form asp-controller="Auth" asp-action="Logout" method="post" style="margin:0">
+          <button class="nav-action" type="submit" style="background:none;border:none;cursor:pointer">Salir</button>
+        </form>
+      }
+      else
+      {
+        <a asp-controller="Auth" asp-action="Login" class="nav-user" title="Ingresar">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5">
+            <circle cx="8" cy="5.5" r="2.5"/><path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/>
+          </svg>
+        </a>
+      }
+    </div>
+  </div>
+</nav>
+<partial name="_Filmstrip" />
+
+@if (TempData["Flash"] is string flash && !string.IsNullOrWhiteSpace(flash))
+{
+  <div class="container" style="padding-top:16px">
+    <div class="alert alert-cream"><span class="alert-icon">›</span><div class="alert-msg">@flash</div></div>
+  </div>
+}
+
+@RenderBody()
+
+<partial name="_Filmstrip" />
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">FRAME<span>·</span></div>
+      <div class="footer-tagline">Multiplex · Repertorio · Estreno</div>
+    </div>
+    <div>
+      <div class="footer-col-title">Cine</div>
+      <a class="footer-link" asp-controller="Home" asp-action="Index">Cartelera</a>
+      <a class="footer-link" asp-controller="Alquiler" asp-action="Index">Eventos</a>
+      <a class="footer-link" asp-controller="Membresia" asp-action="Index">Membresía</a>
+    </div>
+    <div>
+      <div class="footer-col-title">Cuenta</div>
+      @if (isAuth)
+      {
+        <a class="footer-link" asp-controller="Perfil" asp-action="Index">Mi perfil</a>
+        <a class="footer-link" asp-controller="Perfil" asp-action="Historial">Historial</a>
+      }
+      else
+      {
+        <a class="footer-link" asp-controller="Auth" asp-action="Login">Ingresar</a>
+        <a class="footer-link" asp-controller="Auth" asp-action="Registro">Crear cuenta</a>
+      }
+    </div>
+    <div>
+      <div class="footer-col-title">Contacto</div>
+      <a class="footer-link" href="mailto:hola@frame.local">hola@frame.local</a>
+      <a class="footer-link" href="tel:+576045555555">+57 604 555 5555</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© @DateTime.Now.Year FRAME Multiplex · Todos los derechos reservados</div>
+    <div class="footer-copy">Sala 1 · Medellín, Colombia</div>
+  </div>
+</footer>
+
+<script src="~/js/site.js" defer></script>
+@RenderSection("Scripts", required: false)
+</body>
+</html>

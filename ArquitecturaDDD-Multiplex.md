@@ -1464,3 +1464,84 @@ ContratoVigenciaScheduler — proceso de background que evalúa vencimientos de 
 
 # **ESTRUCTURA DE CARPETAS**
 Cada microservicio tiene una estructura de carpetas consistente, que falta por definir. La idea es organizar el código de cada microservicio siguiendo la separación de capas, con subcarpetas para cada tipo de componente (agregados, servicios, eventos, etc.) dentro de la capa de dominio. La capa de aplicación tendrá una carpeta para casos de uso, y la capa de infraestructura tendrá carpetas para repositorios, clientes HTTP y otros adaptadores. La capa de presentación tendrá controladores organizados por recurso.
+---
+
+# **CAPA DE PRESENTACIÓN — BFF (Multiplex.Web)**
+
+`src/Web/Multiplex.Web` es la única interfaz humana del sistema: una app ASP.NET Core MVC (.NET 10) que actúa simultáneamente como **UI** (19 pantallas Razor con el design system FRAME) y **Backend-For-Frontend** que orquesta llamadas HTTP a los 6 microservicios.
+
+## Principio: el dominio no se corrompe
+
+- El proyecto Web **no referencia** ningún `*.Domain` ni `*.Application` (verificable con `dotnet list src/Web/Multiplex.Web/Multiplex.Web.csproj reference`).
+- Todos los DTOs viven en `Multiplex.Web.Models.Dtos` — mirrors del wire-format de cada microservicio.
+- Los enums (`TipoDocumento`, `Clasificacion`, `TipoFormato`, `MetodoPago`, `TipoParametro`) se mapean por valor entero igual al del dominio, sin importar tipos.
+
+## Autenticación
+
+- **El BFF es la única frontera de autenticación.** Los microservicios siguen siendo abiertos y de red interna.
+- Login/registro emiten un JWT HS256 firmado por el BFF, almacenado en cookie `auth_token` (HttpOnly, SameSite=Lax, Secure en prod).
+- `EspectadorIdHandler` (DelegatingHandler) lee el claim `idEspectador` y propaga header `X-Espectador-Id` a cada llamada saliente.
+- Tabla `Users` en SQLite local del BFF (`Data/bff_identity.db`) — guarda email, PasswordHash (PBKDF2), Role (CLIENTE|ADMIN), IdEspectador.
+- **BC Clientes NUNCA almacena passwordHash.** Solo guarda el perfil del espectador.
+
+## Estructura
+
+```
+src/Web/Multiplex.Web/
+├── Auth/                      BffIdentityDbContext, User, PasswordHasher, JwtTokenService, EspectadorIdHandler
+├── Services/                  6 typed HttpClients (uno por microservicio)
+├── Models/                    DTOs + Cart en ISession
+├── Controllers/               Home, Auth, Peliculas, Reserva, Perfil, Membresia, Alquiler
+├── Areas/Admin/Controllers/   Peliculas, Salas, Funciones, Contratos, Financiero
+├── Views/                     14 vistas públicas
+├── Areas/Admin/Views/         5 vistas admin
+└── wwwroot/                   CSS, JS, assets del prototipo FRAME
+```
+
+## Mapeo 19 pantallas → microservicios
+
+| Pantalla | Ruta | Servicios consumidos |
+|----------|------|----------------------|
+| Cartelera | `GET /` | Programacion |
+| Login / Registro | `/auth/login`, `/auth/registro` | Clientes |
+| Detalle película | `/peliculas/{id}` | Programacion |
+| Funciones | `/peliculas/{id}/funciones` | Programacion |
+| Sillas | `/reserva/funcion/{id}/sillas` | Programacion + Infraestructura |
+| Carrito | `/reserva/carrito` | ISession |
+| Confitería | `/reserva/confiteria` | Ventas (stub) |
+| Checkout | `/reserva/checkout` | Clientes + Ventas + Infraestructura + Financiero |
+| Confirmación | `/reserva/confirmacion/{idOrden}` | Financiero |
+| Perfil / Historial | `/perfil`, `/perfil/historial` | Clientes + Financiero |
+| Membresía | `/membresia` | Clientes (nivel actual) |
+| Alquiler | `/alquiler` | Cadena |
+| Admin · Películas | `/admin/peliculas` | Programacion |
+| Admin · Salas | `/admin/salas` | Infraestructura |
+| Admin · Funciones | `/admin/funciones` | Programacion |
+| Admin · Contratos | `/admin/contratos` | Cadena |
+| Admin · Financiero | `/admin/financiero` | Financiero |
+
+## API gaps pendientes en microservicios
+
+El BFF resuelve estos endpoints con listas seed en memoria (marcadas con `// TODO`). Pasar a producción requiere exponerlos en el microservicio correspondiente:
+
+1. **Programacion** — `GET /v1/programacion/peliculas` (lista + por id).
+2. **Programacion** — `GET /v1/programacion/funciones?idPelicula={id}`.
+3. **Ventas** — `GET /v1/ventas/confiteria/productos`.
+4. **Infraestructura** — `GET /v1/infraestructura/salas` (lista).
+5. **Cadena** — `GET /v1/cadena/contratos` sin filtro obligatorio.
+
+## Cómo levantar localmente
+
+```pwsh
+docker compose up -d postgres rabbitmq
+# Cada API en su propia terminal:
+dotnet run --project src/Clientes/Clientes.Api          # 5001
+dotnet run --project src/Programacion/Programacion.Api  # 5002
+dotnet run --project src/Infraestructura/Infraestructura.Api # 5003
+dotnet run --project src/Ventas/Ventas.Api              # 5004
+dotnet run --project src/Financiero/Financiero.Api      # 5005
+dotnet run --project src/Cadena/Cadena.Api              # 5006
+dotnet run --project src/Web/Multiplex.Web              # 5000
+```
+
+Admin seed por defecto: `admin@frame.local` / `admin1234` (configurable en `appsettings.Development.json` bajo `Bff:SeedAdmin`).

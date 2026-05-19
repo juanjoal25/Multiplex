@@ -1,0 +1,106 @@
+@model SillasVm
+@{
+    ViewData["Title"] = "Seleccionar Sillas — FRAME";
+    var sillasPorFila = Model.Disponibilidad.Sillas
+        .GroupBy(s => s.Fila)
+        .OrderBy(g => g.Key)
+        .ToList();
+}
+@section Styles {
+<style>
+.booking-bar{background:var(--black);padding:18px 0;border-bottom:.5px solid var(--void)}
+.booking-bar-inner{max-width:1280px;margin:0 auto;padding:0 40px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.booking-title{font-family:var(--fd);font-size:28px;color:var(--cream);text-transform:uppercase}
+.booking-meta{font-family:var(--fm);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--house)}
+.steps-bar{margin-left:auto;display:flex;gap:0;align-items:center}
+.seatmap-wrap{overflow-x:auto;padding:8px 0}
+.main-inner{max-width:1280px;margin:0 auto;padding:40px;display:grid;grid-template-columns:1fr 320px;gap:36px;align-items:start}
+.seatmap-panel{background:var(--cream-warm);border:.5px solid var(--paper);padding:28px}
+.seatmap-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:.5px solid var(--paper)}
+.seatmap-title{font-family:var(--fd);font-size:20px;text-transform:uppercase;letter-spacing:.04em}
+.seatmap-avail{font-family:var(--fm);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--house)}
+.ticket-count{font-family:var(--fd);font-size:14px;color:var(--red)}
+.seat{position:relative}
+.seat input{position:absolute;inset:0;opacity:0;cursor:pointer}
+@@media(max-width:900px){.main-inner{grid-template-columns:1fr}}
+</style>
+}
+
+<section class="booking-bar">
+  <div class="booking-bar-inner">
+    <div>
+      <div class="breadcrumb" style="color:var(--house)">
+        <a asp-controller="Home" asp-action="Index" style="color:var(--house)">Cartelera</a>
+        <span class="breadcrumb-sep">/</span>Sillas
+      </div>
+      <div class="booking-title">@(ViewBag.Pelicula as string ?? "Función")</div>
+      <div class="booking-meta">
+        Formato @Model.Funcion.Formato · @Model.Funcion.Inicio.ToLocalTime().ToString("ddd dd MMM · HH:mm", System.Globalization.CultureInfo.GetCultureInfo("es-CO"))
+        · @Model.PrecioBoleta.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("es-CO"))/silla
+      </div>
+    </div>
+    <div class="steps-bar">
+      <div class="step done"><div class="step-num">1</div><span>Sillas</span></div>
+      <div class="step-sep"></div>
+      <div class="step"><div class="step-num">2</div><span>Confitería</span></div>
+      <div class="step-sep"></div>
+      <div class="step"><div class="step-num">3</div><span>Pago</span></div>
+    </div>
+  </div>
+</section>
+<partial name="_Filmstrip" />
+
+<form method="post" asp-action="ElegirSillas" asp-route-idFuncion="@Model.Funcion.Id">
+  @Html.AntiForgeryToken()
+  <div class="main-inner">
+    <div>
+      <div class="seatmap-panel">
+        <div class="seatmap-header">
+          <div class="seatmap-title">Sala · @Model.Disponibilidad.Disponibles disponibles de @Model.Disponibilidad.Aforo</div>
+          <div class="seatmap-avail"><span class="ticket-count" id="seatCount" data-price="@Model.PrecioBoleta">0</span> seleccionadas</div>
+        </div>
+        <div class="seatmap-screen"></div>
+        <div class="seatmap-screen-lbl">Pantalla</div>
+        <div class="seatmap-wrap">
+          @foreach (var fila in sillasPorFila)
+          {
+            <div class="seat-row-wrap">
+              <div class="seat-row-label">@fila.Key</div>
+              @foreach (var s in fila.OrderBy(x => x.Columna))
+              {
+                var libre = string.Equals(s.Estado, "Libre", StringComparison.OrdinalIgnoreCase);
+                var vip = string.Equals(s.Tipo, "Vip", StringComparison.OrdinalIgnoreCase);
+                var classes = "seat" + (vip ? " vip" : "") + (libre ? "" : " taken");
+                <button type="button" class="@classes" data-seat data-label="@s.Fila@s.Columna" aria-label="Silla @s.Fila@s.Columna">
+                  @if (libre)
+                  {
+                    <input type="checkbox" name="sillas" value="@s.IdSilla" />
+                  }
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <div class="seatmap-legend">
+          <div class="seatmap-legend-item"><div class="seatmap-legend-icon" style="background:var(--paper)"></div>Disponible</div>
+          <div class="seatmap-legend-item"><div class="seatmap-legend-icon" style="background:var(--red)"></div>Seleccionada</div>
+          <div class="seatmap-legend-item"><div class="seatmap-legend-icon" style="background:var(--void)"></div>Ocupada</div>
+          <div class="seatmap-legend-item"><div class="seatmap-legend-icon" style="background:#B8A040"></div>VIP</div>
+        </div>
+      </div>
+    </div>
+    <aside>
+      <div class="summary-box">
+        <div class="summary-title">Tu selección</div>
+        <div class="summary-row"><div class="summary-key">Formato</div><div class="summary-val">@Model.Funcion.Formato</div></div>
+        <div class="summary-row"><div class="summary-key">Fecha y hora</div><div class="summary-val">@Model.Funcion.Inicio.ToLocalTime().ToString("dd MMM · HH:mm")</div></div>
+        <div class="summary-row"><div class="summary-key">Sillas</div>
+          <div class="summary-val"><ul id="seatList" style="list-style:none;padding:0;margin:0;text-align:right"></ul></div>
+        </div>
+        <div class="summary-row"><div class="summary-key">Precio/silla</div><div class="summary-val">@Model.PrecioBoleta.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("es-CO"))</div></div>
+        <div class="summary-row summary-total"><div class="summary-key">Total</div><div class="summary-val">$<span id="seatTotal">0</span></div></div>
+        <button class="btn btn-primary btn-full" type="submit" style="margin-top:20px">Continuar a confitería</button>
+      </div>
+    </aside>
+  </div>
+</form>

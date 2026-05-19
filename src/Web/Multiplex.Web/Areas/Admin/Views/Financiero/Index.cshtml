@@ -1,0 +1,70 @@
+@model FinancieroVm
+@{
+    ViewData["Title"] = "Financiero — Admin FRAME";
+    ViewData["AdminActive"] = "financiero";
+    var co = System.Globalization.CultureInfo.GetCultureInfo("es-CO");
+    var aprobadas = Model.Registros.Where(r => r.EstadoPago.Equals("Aprobado", StringComparison.OrdinalIgnoreCase)).ToList();
+    var ingresos = aprobadas.Sum(r => r.ValorTotal);
+    var ticketMedio = aprobadas.Count > 0 ? ingresos / aprobadas.Count : 0m;
+    var diasGrupos = Model.Registros
+        .GroupBy(r => r.Fecha.Date)
+        .OrderByDescending(g => g.Key)
+        .Take(7)
+        .ToList();
+    var maxDia = diasGrupos.Count > 0 ? diasGrupos.Max(g => g.Sum(r => r.ValorTotal)) : 1m;
+}
+
+<div class="admin-page-header">
+  <div>
+    <div class="admin-eyebrow">// Finanzas</div>
+    <div class="admin-page-title">Financiero · últimos @Model.Dias días</div>
+  </div>
+  <form method="get" style="display:flex;gap:8px;align-items:center">
+    <span class="filter-label">Periodo:</span>
+    <select name="dias" class="form-select" style="background-color:var(--void);color:var(--cream);border-color:var(--shadow);width:140px" onchange="this.form.submit()">
+      <option value="7" selected="@(Model.Dias == 7)">Últimos 7 días</option>
+      <option value="30" selected="@(Model.Dias == 30)">Últimos 30 días</option>
+      <option value="90" selected="@(Model.Dias == 90)">Últimos 90 días</option>
+      <option value="365" selected="@(Model.Dias == 365)">Último año</option>
+    </select>
+  </form>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px">
+  <div class="stat-card"><div class="stat-value">@ingresos.ToString("C0", co)</div><div class="stat-label">Ingresos aprobados</div></div>
+  <div class="stat-card"><div class="stat-value">@aprobadas.Count</div><div class="stat-label">Transacciones</div></div>
+  <div class="stat-card"><div class="stat-value">@ticketMedio.ToString("C0", co)</div><div class="stat-label">Ticket medio</div></div>
+  <div class="stat-card"><div class="stat-value">@(Model.Registros.Count - aprobadas.Count)</div><div class="stat-label">No aprobadas</div></div>
+</div>
+
+<div style="background:var(--void);padding:24px;margin-bottom:24px">
+  <div class="t-label" style="margin-bottom:16px">// Últimos 7 días</div>
+  <div style="display:flex;align-items:flex-end;gap:8px;height:160px">
+    @foreach (var g in diasGrupos.OrderBy(x => x.Key))
+    {
+      var total = g.Sum(r => r.ValorTotal);
+      var h = (int)Math.Round((double)total / (double)maxDia * 150);
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div style="width:100%;background:var(--red);height:@(h)px;min-height:2px"></div>
+        <div class="t-meta" style="color:var(--house)">@g.Key.ToString("dd MMM")</div>
+      </div>
+    }
+  </div>
+</div>
+
+<table class="data-table">
+  <thead><tr><th>Fecha</th><th>Orden</th><th>Estado</th><th>Moneda</th><th style="text-align:right">Total</th></tr></thead>
+  <tbody>
+    @foreach (var r in Model.Registros.OrderByDescending(x => x.Fecha).Take(50))
+    {
+      var ok = r.EstadoPago.Equals("Aprobado", StringComparison.OrdinalIgnoreCase);
+      <tr>
+        <td>@r.Fecha.ToLocalTime().ToString("dd MMM yyyy · HH:mm")</td>
+        <td style="font-family:var(--fm);font-size:10px;color:var(--house)">@r.IdOrden.ToString().Substring(0, 18)</td>
+        <td><span class="tag @(ok ? "tag-green" : "tag-red")">@r.EstadoPago</span></td>
+        <td>@r.Moneda</td>
+        <td style="text-align:right;font-family:var(--fd);font-size:18px">@r.ValorTotal.ToString("C0", co)</td>
+      </tr>
+    }
+  </tbody>
+</table>

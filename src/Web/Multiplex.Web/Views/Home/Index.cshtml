@@ -1,0 +1,104 @@
+@model CarteleraVm
+@{
+    ViewData["Title"] = "Cartelera — FRAME";
+    var hoy = DateTime.Now.ToString("ddd dd MMM · yyyy", System.Globalization.CultureInfo.GetCultureInfo("es-CO"));
+    var fondos = new[] { "#0D0C0B", "#1A0808", "#080C14", "#080808", "#081410", "#080E18" };
+}
+@section Styles {
+<style>
+.hero{background:var(--black);padding:64px 0 52px;border-bottom:2px solid var(--red);position:relative;overflow:hidden}
+.hero-inner{max-width:1280px;margin:0 auto;padding:0 40px;display:grid;grid-template-columns:1fr 440px;gap:40px;align-items:end}
+.hero-bg-num{font-family:var(--fd);font-size:300px;color:var(--red);opacity:.04;line-height:1;position:absolute;right:-20px;top:-40px;pointer-events:none;user-select:none}
+.hero-eyebrow{font-family:var(--fm);font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--red);margin-bottom:16px}
+.hero-title{font-family:var(--fd);font-size:110px;line-height:.86;color:var(--cream);text-transform:uppercase}
+.hero-sub{font-family:var(--fm);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--house);margin-top:20px;border-top:.5px solid var(--void);padding-top:16px;line-height:1.9}
+.hero-feat{background:var(--void);padding:28px;border-left:3px solid var(--red)}
+.hero-feat-label{font-family:var(--fm);font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+.hero-feat-title{font-family:var(--fd);font-size:48px;color:var(--cream);line-height:.92;text-transform:uppercase}
+.hero-feat-title em{color:var(--red);font-style:normal}
+.hero-feat-meta{font-family:var(--fm);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--house);margin-top:10px;line-height:1.9}
+.hero-feat-quote{font-family:var(--fs);font-style:italic;font-size:14px;color:var(--paper);margin-top:12px;line-height:1.5}
+.filters-wrap{max-width:1280px;margin:0 auto;padding:0 40px;border-bottom:.5px solid var(--paper)}
+.movies{max-width:1280px;margin:0 auto;padding:48px 40px}
+.sec-div{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+.sec-div-title{font-family:var(--fd);font-size:18px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.sec-div-line{flex:1;height:.5px;background:var(--paper)}
+@@media(max-width:900px){.hero-inner{grid-template-columns:1fr}.hero-feat{display:none}.movies .grid-3{grid-template-columns:1fr 1fr}}
+@@media(max-width:600px){.hero-title{font-size:72px}.movies .grid-3{grid-template-columns:1fr}}
+</style>
+}
+
+@{
+    var destacada = Model.Peliculas.FirstOrDefault();
+}
+<section class="hero">
+  <div class="hero-bg-num">@Model.Peliculas.Count</div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Temporada @DateTime.Now.ToString("MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("es-CO"))</div>
+      <div class="hero-title">En<br>Car<br>te<br>lera</div>
+      <div class="hero-sub">@Model.Peliculas.Count películas · @Model.FuncionesHoy funciones programadas hoy<br>IMAX · 4DX · 3D Premium · VIP</div>
+    </div>
+    @if (destacada is not null)
+    {
+      <div class="hero-feat">
+        <div class="hero-feat-label">// Destacada de la semana</div>
+        <div class="hero-feat-title">@destacada.Titulo</div>
+        <div class="hero-feat-meta">@destacada.Genero · @destacada.DuracionMinutos MIN · @destacada.Clasificacion</div>
+        <div class="hero-feat-quote">@destacada.Sinopsis</div>
+        <div style="margin-top:20px">
+          <a asp-controller="Peliculas" asp-action="Detalle" asp-route-id="@destacada.Id" class="btn btn-primary btn-sm">Ver función</a>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+<partial name="_Filmstrip" />
+
+<div class="filters-wrap">
+  <div class="filter-bar">
+    <span class="filter-label">Género:</span>
+    <button class="filter-chip active" onclick="setFilter(this,'genre','todos')">Todos</button>
+    <button class="filter-chip" onclick="setFilter(this,'genre','drama')">Drama</button>
+    <button class="filter-chip" onclick="setFilter(this,'genre','thriller')">Thriller</button>
+    <button class="filter-chip" onclick="setFilter(this,'genre','accion')">Acción</button>
+    <button class="filter-chip" onclick="setFilter(this,'genre','terror')">Terror</button>
+    <span class="filter-label" style="margin-left:12px">Formato:</span>
+    <button class="filter-chip format active" onclick="setFilter(this,'format','todos')">Todos</button>
+    <button class="filter-chip format" onclick="setFilter(this,'format','imax')">IMAX</button>
+    <button class="filter-chip format" onclick="setFilter(this,'format','4dx')">4DX</button>
+  </div>
+</div>
+
+<div class="movies">
+  <div class="sec-div">
+    <span class="sec-div-title">Funciones disponibles hoy</span>
+    <div class="sec-div-line"></div>
+    <span class="t-meta">@hoy</span>
+  </div>
+  <div class="grid-3">
+    @{ var i = 0; }
+    @foreach (var p in Model.Peliculas)
+    {
+      var bg = fondos[i++ % fondos.Length];
+      <a asp-controller="Peliculas" asp-action="Detalle" asp-route-id="@p.Id" class="movie-card">
+        <div class="card-poster" style="background:@bg">
+          <div class="card-poster-scan"></div>
+          <div class="card-poster-band"></div>
+          <div class="card-poster-title">@p.Titulo</div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <div class="tag-row">
+              <span class="tag tag-red">@(p.Estado == "Cartelera" ? "En Cartelera" : p.Estado)</span>
+              <span class="tag tag-outline">@p.Formato</span>
+            </div>
+            <div><span class="card-rating">@p.Rating.ToString("0.0")</span><span class="card-rating-denom">/10</span></div>
+          </div>
+          <div class="t-meta">@p.Genero · @p.DuracionMinutos min · @p.Clasificacion</div>
+          <div class="card-synopsis">@p.Sinopsis</div>
+        </div>
+      </a>
+    }
+  </div>
+</div>

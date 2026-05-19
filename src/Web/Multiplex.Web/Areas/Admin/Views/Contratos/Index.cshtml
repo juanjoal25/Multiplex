@@ -1,0 +1,81 @@
+@model IReadOnlyCollection<ContratoSummary>
+@{
+    ViewData["Title"] = "Contratos — Admin FRAME";
+    ViewData["AdminActive"] = "contratos";
+}
+@section Styles {
+<style>
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--black);border:1px solid var(--void);padding:36px;width:640px;max-height:90vh;overflow-y:auto;border-top:3px solid var(--red)}
+.modal-title{font-family:var(--fd);font-size:32px;color:var(--cream);text-transform:uppercase;margin-bottom:24px}
+.contract-card{background:var(--void);border:.5px solid #1E1C1A;padding:24px}
+.contract-tercero{font-family:var(--fd);font-size:24px;color:var(--cream);text-transform:uppercase}
+.contract-meta{font-family:var(--fm);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--house);margin-top:6px}
+.contract-cond{font-family:var(--fm);font-size:11px;color:var(--paper);margin-top:14px;line-height:1.7}
+</style>
+}
+
+<div class="admin-page-header">
+  <div>
+    <div class="admin-eyebrow">// Comercial</div>
+    <div class="admin-page-title">Contratos corporativos</div>
+  </div>
+  <button class="btn btn-primary btn-sm" data-modal-open="modalContrato">+ Nuevo contrato</button>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+  @foreach (var c in Model)
+  {
+    var vigente = c.Estado.Equals("Vigente", StringComparison.OrdinalIgnoreCase);
+    <div class="contract-card">
+      <div style="display:flex;align-items:start;justify-content:space-between;gap:12px">
+        <div>
+          <div class="contract-tercero">@c.Tercero</div>
+          <div class="contract-meta">@c.VigenciaInicio.ToString("dd MMM yyyy") — @c.VigenciaFin.ToString("dd MMM yyyy")</div>
+        </div>
+        <span class="tag @(vigente ? "tag-green" : "tag-void")">@c.Estado</span>
+      </div>
+      <div class="contract-cond">@c.Condiciones</div>
+      @if (vigente)
+      {
+        <form method="post" asp-action="Cancelar" asp-route-id="@c.Id" style="margin-top:18px">
+          @Html.AntiForgeryToken()
+          <input type="hidden" name="motivo" value="Cancelación administrativa" />
+          <button type="submit" class="tbl-btn danger">Cancelar contrato</button>
+        </form>
+      }
+    </div>
+  }
+</div>
+
+<div class="modal-overlay" id="modalContrato">
+  <div class="modal">
+    <div class="modal-title">Nuevo contrato</div>
+    <form method="post" asp-action="Nuevo">
+      @Html.AntiForgeryToken()
+      <div class="form-field">
+        <label class="form-label" style="color:var(--house)">Tercero / Empresa</label>
+        <input class="form-input dark" name="Tercero" type="text" required />
+      </div>
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label class="form-label" style="color:var(--house)">Inicio vigencia</label>
+          <input class="form-input dark" name="Inicio" type="date" required />
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="color:var(--house)">Fin vigencia</label>
+          <input class="form-input dark" name="Fin" type="date" required />
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label" style="color:var(--house)">Condiciones</label>
+        <textarea class="form-input dark" name="Condiciones" rows="4" placeholder="Términos del acuerdo..." required></textarea>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:24px;justify-content:flex-end">
+        <button type="button" class="btn btn-outline-light" data-modal-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">Registrar</button>
+      </div>
+    </form>
+  </div>
+</div>

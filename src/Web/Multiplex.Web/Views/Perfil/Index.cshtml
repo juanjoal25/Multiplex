@@ -1,0 +1,62 @@
+@model PerfilVm
+@{
+    ViewData["Title"] = "Mi perfil — FRAME";
+    var initials = string.Concat(Model.Nombre.Split(' ').Where(p => p.Length > 0).Take(2).Select(p => p[0])).ToUpper();
+}
+@section Styles {
+<style>
+.account-wrap{max-width:1280px;margin:0 auto;padding:48px 40px}
+.acc-grid{display:grid;grid-template-columns:240px 1fr;gap:48px;align-items:start}
+.avatar{width:140px;height:140px;background:var(--black);color:var(--cream);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:56px;border:2px solid var(--red)}
+.info-card{background:var(--cream-warm);border:.5px solid var(--paper);padding:28px;margin-bottom:18px}
+.info-card h3{font-family:var(--fd);font-size:22px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px}
+.kv{display:flex;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--paper);font-family:var(--fm);font-size:12px}
+.kv:last-child{border-bottom:none}
+.kv-key{color:var(--house);letter-spacing:.15em;text-transform:uppercase;font-size:10px}
+@@media(max-width:900px){.acc-grid{grid-template-columns:1fr}}
+</style>
+}
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="t-label" style="margin-bottom:8px">// Cuenta</div>
+    <div style="font-family:var(--fd);font-size:64px;color:var(--cream);text-transform:uppercase;line-height:.9">Mi perfil</div>
+  </div>
+</div>
+<partial name="_Filmstrip" />
+
+<div class="account-wrap">
+  <div class="acc-grid">
+    <div style="text-align:center">
+      <div class="avatar">@initials</div>
+      <div style="margin-top:18px;font-family:var(--fd);font-size:24px;text-transform:uppercase">@Model.Nombre</div>
+      <div class="t-meta" style="margin-top:6px">Plan @Model.Nivel · @Model.Estado</div>
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px">
+        <a asp-action="Historial" class="btn btn-outline btn-sm">Ver historial</a>
+        <a asp-controller="Membresia" asp-action="Index" class="btn-ghost">Cambiar plan →</a>
+      </div>
+    </div>
+
+    <div>
+      <div class="info-card">
+        <h3>Membresía</h3>
+        <div class="kv"><span class="kv-key">Nivel actual</span><span>@Model.Nivel</span></div>
+        <div class="kv"><span class="kv-key">Descuento</span><span>@Model.Descuento.ToString("0.##")%</span></div>
+        <div class="kv"><span class="kv-key">Estado</span><span>@Model.Estado</span></div>
+        <div class="kv"><span class="kv-key">ID Espectador</span><span style="font-size:10px">@(Model.IdEspectador?.ToString() ?? "—")</span></div>
+      </div>
+
+      <div class="info-card">
+        <h3>Datos</h3>
+        <div class="kv"><span class="kv-key">Nombre</span><span>@Model.Nombre</span></div>
+        <div class="kv"><span class="kv-key">Correo</span><span>@User.FindFirstValue(System.Security.Claims.ClaimTypes.Email)</span></div>
+      </div>
+
+      <div class="info-card" style="background:var(--black);color:var(--cream);border:none">
+        <h3 style="color:var(--cream)">Próxima función</h3>
+        <p class="t-meta" style="color:var(--house);margin-bottom:14px">No tienes reservas próximas.</p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-sm">Explorar cartelera</a>
+      </div>
+    </div>
+  </div>
+</div>
