@@ -1,0 +1,90 @@
+@model Multiplex.Web.Models.Cart
+@{
+    ViewData["Title"] = "Carrito — FRAME";
+    var co = System.Globalization.CultureInfo.GetCultureInfo("es-CO");
+}
+@section Styles {
+<style>
+.main-inner{max-width:1280px;margin:0 auto;padding:48px 40px;display:grid;grid-template-columns:1fr 340px;gap:36px;align-items:start}
+.card-block{background:var(--cream-warm);border:.5px solid var(--paper);padding:24px;margin-bottom:18px}
+.card-block h3{font-family:var(--fd);font-size:22px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px}
+.line-item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--paper);font-family:var(--fm);font-size:12px}
+.line-item:last-child{border-bottom:none}
+@@media(max-width:900px){.main-inner{grid-template-columns:1fr}}
+</style>
+}
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="t-label" style="margin-bottom:8px">// Carrito</div>
+    <div style="font-family:var(--fd);font-size:64px;color:var(--cream);text-transform:uppercase;line-height:.9">Tu orden</div>
+  </div>
+</div>
+<partial name="_Filmstrip" />
+
+@if (Model.IsEmpty)
+{
+  <div class="main-inner" style="grid-template-columns:1fr">
+    <div class="alert alert-cream"><span class="alert-icon">›</span><div class="alert-msg">Tu carrito está vacío. <a asp-controller="Home" asp-action="Index" style="color:var(--red)">Ver cartelera</a>.</div></div>
+  </div>
+}
+else
+{
+  <div class="main-inner">
+    <div>
+      <div class="card-block">
+        <h3>Boletas</h3>
+        @if (Model.Sillas.Count == 0)
+        {
+          <p class="t-meta">Aún no has elegido sillas.</p>
+        }
+        else
+        {
+          <div class="line-item" style="color:var(--house)"><span>Formato @Model.Formato</span><span>@(Model.Horario?.ToLocalTime().ToString("dd MMM · HH:mm"))</span></div>
+          @foreach (var s in Model.Sillas)
+          {
+            <div class="line-item">
+              <span>Silla @s.Label <span style="color:var(--house)">· @s.TipoSilla</span></span>
+              <span>@s.PrecioBase.ToString("C0", co)</span>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="card-block">
+        <h3>Confitería</h3>
+        @if (Model.Confiteria.Count == 0)
+        {
+          <p class="t-meta">Aún no has agregado snacks. <a asp-action="Confiteria" style="color:var(--red)">Agregar →</a></p>
+        }
+        else
+        {
+          @foreach (var c in Model.Confiteria)
+          {
+            <div class="line-item">
+              <span>@c.Nombre <span style="color:var(--house)">×@c.Cantidad</span></span>
+              <span>@((c.Precio * c.Cantidad).ToString("C0", co))</span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <aside>
+      <div class="summary-box">
+        <div class="summary-title">Resumen</div>
+        <div class="summary-row"><div class="summary-key">Boletas</div><div class="summary-val">@Model.SubtotalBoletas.ToString("C0", co)</div></div>
+        <div class="summary-row"><div class="summary-key">Confitería</div><div class="summary-val">@Model.SubtotalConfiteria.ToString("C0", co)</div></div>
+        <div class="summary-row summary-total"><div class="summary-key">Subtotal</div><div class="summary-val">@Model.Subtotal.ToString("C0", co)</div></div>
+        <div style="margin-top:18px;display:flex;flex-direction:column;gap:10px">
+          <a asp-action="Confiteria" class="btn btn-primary btn-full">Continuar a confitería</a>
+          <a asp-action="Checkout" class="btn btn-outline-light btn-full">Ir directo a pago</a>
+        </div>
+        <form method="post" asp-action="Vaciar" style="margin-top:10px;text-align:center">
+          @Html.AntiForgeryToken()
+          <button type="submit" class="btn-ghost" style="color:var(--house)">Vaciar carrito</button>
+        </form>
+      </div>
+    </aside>
+  </div>
+}

@@ -1,0 +1,112 @@
+@model PeliculaDetalleVm
+@{
+    ViewData["Title"] = $"{Model.Pelicula.Titulo} — FRAME";
+    var p = Model.Pelicula;
+}
+@section Styles {
+<style>
+.movie-hero{background:var(--black);padding:0;border-bottom:2px solid var(--red);overflow:hidden}
+.movie-hero-inner{max-width:1280px;margin:0 auto;padding:56px 40px 0;display:grid;grid-template-columns:1fr 320px;gap:48px;align-items:end}
+.movie-poster-box{height:420px;background:#0D0C0B;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:24px}
+.movie-poster-scan{position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(196,26,26,.04) 0px,rgba(196,26,26,.04) 1px,transparent 1px,transparent 3px)}
+.movie-poster-band{position:absolute;bottom:0;left:0;right:0;height:4px;background:var(--red)}
+.movie-poster-title{font-family:var(--fd);font-size:60px;line-height:.88;color:var(--cream);text-transform:uppercase;position:relative;z-index:1;text-wrap:pretty}
+.movie-big-title{font-family:var(--fd);font-size:72px;line-height:.88;color:var(--cream);text-transform:uppercase;margin-bottom:20px}
+.meta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;font-family:var(--fm);font-size:9px;letter-spacing:.15em;text-transform:uppercase;border:.5px solid;color:var(--cream);border-color:var(--cream)}
+.movie-quote{font-family:var(--fs);font-style:italic;font-size:18px;color:var(--paper);line-height:1.4;margin:20px 0;padding-top:20px;border-top:.5px solid var(--void)}
+.tab-bar{display:flex;gap:0;margin-top:28px}
+.tab{font-family:var(--fm);font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:12px 20px;color:var(--house);cursor:pointer;border-bottom:2px solid transparent;background:none;border-left:none;border-right:none;border-top:none}
+.tab.active{color:var(--cream);border-bottom-color:var(--red)}
+.content-inner{max-width:1280px;margin:0 auto;padding:48px 40px}
+.synopsis-text{font-family:var(--fm);font-size:13px;line-height:1.8;color:var(--shadow);max-width:640px}
+.ficha-grid{display:grid;grid-template-columns:repeat(4,1fr);border:.5px solid var(--paper);margin-top:32px}
+.ficha-item{padding:16px 20px;border-right:.5px solid var(--paper)}
+.ficha-item:last-child{border-right:none}
+.ficha-key{font-family:var(--fm);font-size:8px;letter-spacing:.25em;text-transform:uppercase;color:var(--house);margin-bottom:6px}
+.ficha-val{font-family:var(--fd);font-size:22px;color:var(--black);line-height:1}
+@@media(max-width:900px){.movie-hero-inner{grid-template-columns:1fr}.movie-poster-box{display:none}.ficha-grid{grid-template-columns:1fr 1fr}}
+</style>
+}
+
+<section class="movie-hero">
+  <div class="movie-hero-inner">
+    <div>
+      <div class="breadcrumb">
+        <a asp-controller="Home" asp-action="Index">Cartelera</a>
+        <span class="breadcrumb-sep">/</span>@p.Titulo
+      </div>
+      <div class="movie-big-title">@p.Titulo</div>
+      <div class="meta-row">
+        <span class="tag tag-red">@(p.Estado == "Cartelera" ? "En Cartelera" : p.Estado)</span>
+        <span class="tag tag-black">@p.Clasificacion</span>
+        <span class="badge">@p.DuracionMinutos MIN</span>
+        <span class="badge">@p.Formato</span>
+      </div>
+      <div class="movie-quote">@p.Sinopsis</div>
+      <div class="tab-bar" data-tabs>
+        <button class="tab active" type="button" data-tab="sinopsis">Sinopsis</button>
+        <button class="tab" type="button" data-tab="funciones">Funciones (@Model.Funciones.Count)</button>
+        <button class="tab" type="button" data-tab="ficha">Ficha técnica</button>
+      </div>
+    </div>
+    <div class="movie-poster-box">
+      <div class="movie-poster-scan"></div>
+      <div class="movie-poster-band"></div>
+      <div class="movie-poster-title">@p.Titulo</div>
+    </div>
+  </div>
+</section>
+<partial name="_Filmstrip" />
+
+<div class="content-inner" data-tabs>
+  <div data-panel="sinopsis">
+    <div class="synopsis-text">
+      <p style="margin-bottom:16px">@p.Sinopsis</p>
+      <p>FRAME presenta @p.Titulo en formato @p.Formato. Disfrútala con sonido inmersivo y butacas a medida.</p>
+    </div>
+    <div class="ficha-grid">
+      <div class="ficha-item"><div class="ficha-key">Género</div><div class="ficha-val">@p.Genero</div></div>
+      <div class="ficha-item"><div class="ficha-key">Duración</div><div class="ficha-val">@p.DuracionMinutos min</div></div>
+      <div class="ficha-item"><div class="ficha-key">Clasificación</div><div class="ficha-val">@p.Clasificacion</div></div>
+      <div class="ficha-item"><div class="ficha-key">Rating</div><div class="ficha-val">@(p.Rating > 0 ? p.Rating.ToString("0.0") : "—")</div></div>
+    </div>
+    <div style="margin-top:32px">
+      <a asp-action="Funciones" asp-route-id="@p.Id" class="btn btn-primary btn-lg">Ver funciones y reservar</a>
+    </div>
+  </div>
+
+  <div data-panel="funciones" hidden>
+    @if (Model.Funciones.Count == 0)
+    {
+      <div class="alert alert-cream"><span class="alert-icon">›</span><div class="alert-msg">No hay funciones programadas en cartelera en este momento.</div></div>
+    }
+    else
+    {
+      <div class="showtime-grid">
+        @foreach (var f in Model.Funciones)
+        {
+          <a asp-controller="Reserva" asp-action="Sillas" asp-route-idFuncion="@f.Id" class="showtime-block">
+            <div class="showtime-time">@f.Inicio.ToLocalTime().ToString("HH:mm")</div>
+            <div class="showtime-format">@f.Formato</div>
+          </a>
+        }
+      </div>
+    }
+  </div>
+
+  <div data-panel="ficha" hidden>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+      <div>
+        <div class="t-label" style="margin-bottom:12px">Formato de exhibición</div>
+        <div class="tag-row">
+          <span class="tag tag-outline">@p.Formato</span>
+        </div>
+      </div>
+      <div>
+        <div class="t-label" style="margin-bottom:12px">Sinopsis ampliada</div>
+        <p class="synopsis-text">@p.Sinopsis</p>
+      </div>
+    </div>
+  </div>
+</div>

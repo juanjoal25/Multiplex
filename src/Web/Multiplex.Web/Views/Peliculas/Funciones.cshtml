@@ -1,0 +1,87 @@
+@model PeliculaFuncionesVm
+@{
+    ViewData["Title"] = $"Funciones · {Model.Pelicula.Titulo} — FRAME";
+    var p = Model.Pelicula;
+    var grupos = Model.Funciones
+        .GroupBy(f => f.IdSala)
+        .ToList();
+}
+@section Styles {
+<style>
+.movie-bar{background:var(--black);padding:32px 0;border-bottom:2px solid var(--red)}
+.movie-bar-inner{max-width:1280px;margin:0 auto;padding:0 40px;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end}
+.mb-title{font-family:var(--fd);font-size:42px;color:var(--cream);text-transform:uppercase;line-height:1}
+.mb-meta{font-family:var(--fm);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--house);margin-top:10px}
+.main-inner{max-width:1280px;margin:0 auto;padding:32px 40px 48px}
+.date-section{margin-bottom:24px}
+.date-section-title{font-family:var(--fm);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--red);margin-bottom:12px}
+.sala-section{background:var(--black);color:var(--cream);padding:24px;margin-bottom:16px}
+.sala-header{display:flex;align-items:center;gap:16px;margin-bottom:14px;padding-bottom:14px;border-bottom:.5px solid var(--void)}
+.sala-title{font-family:var(--fd);font-size:24px;letter-spacing:.04em;text-transform:uppercase}
+.sala-caps{font-family:var(--fm);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--house);margin-top:4px}
+.format-filters{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+</style>
+}
+
+<section class="movie-bar">
+  <div class="movie-bar-inner">
+    <div>
+      <div class="breadcrumb" style="color:var(--house)">
+        <a asp-controller="Home" asp-action="Index" style="color:var(--house)">Cartelera</a>
+        <span class="breadcrumb-sep">/</span>
+        <a asp-action="Detalle" asp-route-id="@p.Id" style="color:var(--house)">@p.Titulo</a>
+        <span class="breadcrumb-sep">/</span>Seleccionar función
+      </div>
+      <div class="mb-title">@p.Titulo</div>
+      <div class="mb-meta">@p.Genero · @p.DuracionMinutos min · @p.Clasificacion · @p.Formato</div>
+    </div>
+  </div>
+</section>
+<partial name="_Filmstrip" />
+
+<div class="main-inner">
+  <div class="format-filters">
+    <span class="filter-label">Formato:</span>
+    <button class="filter-chip format active" onclick="setFilter(this,'format','todos')">Todos</button>
+    <button class="filter-chip format" onclick="setFilter(this,'format','imax')">IMAX</button>
+    <button class="filter-chip format" onclick="setFilter(this,'format','4dx')">4DX</button>
+    <button class="filter-chip format" onclick="setFilter(this,'format','3d')">3D</button>
+    <button class="filter-chip format" onclick="setFilter(this,'format','2d')">2D</button>
+  </div>
+
+  @if (grupos.Count == 0)
+  {
+    <div class="alert alert-cream"><span class="alert-icon">›</span><div class="alert-msg">No hay funciones programadas en este momento. Vuelve más tarde.</div></div>
+  }
+  else
+  {
+    @foreach (var grupo in grupos)
+    {
+      var primera = grupo.First();
+      <div class="sala-section">
+        <div class="sala-header">
+          <div>
+            <div class="sala-title">Sala @grupo.Key.ToString().Substring(0, 8)</div>
+            <div class="sala-caps">@primera.TipoSala · Formato @primera.Formato</div>
+          </div>
+          <div style="margin-left:auto"><span class="tag tag-red">@primera.Formato</span></div>
+        </div>
+        <div class="showtime-grid">
+          @foreach (var f in grupo.OrderBy(x => x.Inicio))
+          {
+            <a asp-controller="Reserva" asp-action="Sillas" asp-route-idFuncion="@f.Id" class="showtime-block">
+              <div class="showtime-time">@f.Inicio.ToLocalTime().ToString("HH:mm")</div>
+              <div class="showtime-format">@f.Inicio.ToLocalTime().ToString("dd MMM")</div>
+            </a>
+          }
+        </div>
+      </div>
+    }
+  }
+
+  <div style="margin-top:12px;display:flex;align-items:center;gap:20px;font-family:var(--fm);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--house)">
+    <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:var(--black)"></div>Disponible</div>
+    <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:var(--red)"></div>Pronto a iniciar</div>
+    <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:var(--red-muted);opacity:.5"></div>Agotada</div>
+  </div>
+</div>

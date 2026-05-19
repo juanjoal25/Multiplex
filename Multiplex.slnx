@@ -34,6 +34,9 @@
     <Project Path="src/Shared/Messaging.Contracts/Messaging.Contracts.csproj" />
     <Project Path="src/Shared/Shared.Kernel/Shared.Kernel.csproj" />
   </Folder>
+  <Folder Name="/src/Web/">
+    <Project Path="src/Web/Multiplex.Web/Multiplex.Web.csproj" />
+  </Folder>
   <Folder Name="/src/Ventas/">
     <Project Path="src/Ventas/Ventas.Api/Ventas.Api.csproj" />
     <Project Path="src/Ventas/Ventas.Application/Ventas.Application.csproj" />

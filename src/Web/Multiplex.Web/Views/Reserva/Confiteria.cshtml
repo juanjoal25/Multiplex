@@ -1,0 +1,72 @@
+@model ConfiteriaVm
+@{
+    ViewData["Title"] = "Confitería — FRAME";
+    var co = System.Globalization.CultureInfo.GetCultureInfo("es-CO");
+    var cantidades = Model.Cart.Confiteria.ToDictionary(c => c.IdProducto, c => c.Cantidad);
+}
+@section Styles {
+<style>
+.main-inner{max-width:1280px;margin:0 auto;padding:48px 40px;display:grid;grid-template-columns:1fr 340px;gap:36px;align-items:start}
+.steps-bar{display:flex;gap:0;align-items:center;margin-bottom:24px}
+@@media(max-width:900px){.main-inner{grid-template-columns:1fr}}
+</style>
+}
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="t-label" style="margin-bottom:8px">// Paso 2 · Confitería</div>
+    <div style="font-family:var(--fd);font-size:64px;color:var(--cream);text-transform:uppercase;line-height:.9">Confitería</div>
+    <div class="steps-bar" style="margin-top:20px">
+      <div class="step done"><div class="step-num">1</div><span>Sillas</span></div>
+      <div class="step-sep"></div>
+      <div class="step active"><div class="step-num">2</div><span>Confitería</span></div>
+      <div class="step-sep"></div>
+      <div class="step"><div class="step-num">3</div><span>Pago</span></div>
+    </div>
+  </div>
+</div>
+<partial name="_Filmstrip" />
+
+<form method="post" asp-action="GuardarConfiteria">
+  @Html.AntiForgeryToken()
+  <div class="main-inner">
+    <div>
+      <div class="grid-3">
+        @foreach (var p in Model.Productos)
+        {
+          var q = cantidades.TryGetValue(p.Id, out var v) ? v : 0;
+          <div class="food-card">
+            <div class="food-card-img">
+              <div class="food-card-img-scan"></div>
+              <div class="food-card-icon">@p.Nombre.Substring(0, 1).ToUpper()</div>
+            </div>
+            <div class="food-card-name">@p.Nombre</div>
+            <div class="food-card-desc">@p.Descripcion</div>
+            <div class="food-card-footer">
+              <div class="food-card-price">@p.Precio.ToString("C0", co)</div>
+              <div class="qty-control" data-qty>
+                <button class="qty-btn" type="button" data-qty-dec>−</button>
+                <input class="qty-val" name="qty[@p.Id]" type="number" min="0" value="@q" style="border:none;background:none" />
+                <button class="qty-btn" type="button" data-qty-inc>+</button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+    <aside>
+      <div class="summary-box">
+        <div class="summary-title">Tu orden</div>
+        <div class="summary-row"><div class="summary-key">Boletas</div><div class="summary-val">@Model.Cart.SubtotalBoletas.ToString("C0", co)</div></div>
+        <div class="summary-row"><div class="summary-key">Confitería actual</div><div class="summary-val">@Model.Cart.SubtotalConfiteria.ToString("C0", co)</div></div>
+        <div class="summary-row summary-total"><div class="summary-key">Subtotal</div><div class="summary-val">@Model.Cart.Subtotal.ToString("C0", co)</div></div>
+        <div style="margin-top:18px">
+          <button type="submit" class="btn btn-primary btn-full">Continuar a pago</button>
+        </div>
+        <div style="margin-top:10px;text-align:center">
+          <a asp-action="Carrito" class="btn-ghost">Volver al carrito</a>
+        </div>
+      </div>
+    </aside>
+  </div>
+</form>

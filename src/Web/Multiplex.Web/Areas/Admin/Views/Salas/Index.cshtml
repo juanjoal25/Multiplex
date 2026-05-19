@@ -1,0 +1,47 @@
+@model IReadOnlyCollection<SalaSummary>
+@{
+    ViewData["Title"] = "Salas — Admin FRAME";
+    ViewData["AdminActive"] = "salas";
+}
+
+<div class="admin-page-header">
+  <div>
+    <div class="admin-eyebrow">// Gestión de infraestructura</div>
+    <div class="admin-page-title">Salas</div>
+  </div>
+  <div class="t-meta">@Model.Count salas registradas</div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+  @foreach (var s in Model)
+  {
+    var mant = s.Estado.Equals("Mantenimiento", StringComparison.OrdinalIgnoreCase);
+    <div class="sala-card@(mant ? " maintenance" : "")">
+      <div class="sala-number">@s.Nombre.Substring(Math.Max(0, s.Nombre.Length - 1))</div>
+      <div class="sala-name">@s.Nombre</div>
+      <div class="sala-type">@s.Tipo</div>
+      <div class="sala-capacity">@s.Aforo</div>
+      <div class="t-meta" style="margin-top:6px;color:var(--house)">Aforo</div>
+      <div style="margin-top:16px;display:flex;align-items:center;gap:8px">
+        <span class="sala-status-dot @(mant ? "maintenance" : "active")"></span>
+        <span style="font-family:var(--fm);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:@(mant ? "var(--red)" : "#6FCF7A")">@s.Estado</span>
+      </div>
+      <div style="margin-top:18px;display:flex;gap:8px">
+        @if (mant)
+        {
+          <form method="post" asp-action="Reactivar" asp-route-id="@s.Id" style="margin:0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-primary btn-sm">Reactivar</button>
+          </form>
+        }
+        else
+        {
+          <form method="post" asp-action="Mantenimiento" asp-route-id="@s.Id" style="margin:0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-light btn-sm">Mantenimiento</button>
+          </form>
+        }
+      </div>
+    </div>
+  }
+</div>

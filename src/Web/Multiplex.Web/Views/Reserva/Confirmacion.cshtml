@@ -1,0 +1,62 @@
+@model ConfirmacionVm
+@{
+    ViewData["Title"] = "Confirmación — FRAME";
+    var co = System.Globalization.CultureInfo.GetCultureInfo("es-CO");
+    var codigo = Model.IdOrden.ToString("N").Substring(0, 10).ToUpper();
+}
+@section Styles {
+<style>
+.confirm-hero{background:var(--black);padding:64px 0;border-bottom:2px solid var(--red);text-align:center}
+.confirm-hero h1{font-family:var(--fd);font-size:96px;color:var(--cream);text-transform:uppercase;line-height:.88}
+.confirm-hero h1 em{color:var(--red);font-style:normal}
+.confirm-content{max-width:760px;margin:0 auto;padding:48px 40px}
+</style>
+}
+
+<section class="confirm-hero">
+  <div class="t-label" style="color:var(--red);letter-spacing:.4em">// Función confirmada</div>
+  <h1 style="margin-top:8px">¡Listo!<br><em>Te esperamos</em></h1>
+  <div style="font-family:var(--fm);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--house);margin-top:20px">
+    Código de reserva · <span style="color:var(--cream);font-family:var(--fd);font-size:16px">@codigo</span>
+  </div>
+</section>
+<partial name="_Filmstrip" />
+
+<div class="confirm-content">
+  <div class="ticket" style="margin-bottom:32px">
+    <div class="ticket-stub"><div class="ticket-stub-text">FRAME</div></div>
+    <div class="ticket-body">
+      <div class="ticket-movie">Tu orden</div>
+      <div class="ticket-details">
+        Orden #@Model.IdOrden.ToString().ToUpper().Substring(0, 18)<br>
+        @if (Model.Transaccion is not null)
+        {
+          <span>Transacción @Model.Transaccion.Estado · @Model.Transaccion.ValorTotal.ToString("C0", co)</span>
+        }
+        else
+        {
+          <span>Pago registrado correctamente</span>
+        }
+      </div>
+    </div>
+    <div class="ticket-barcode">
+      <div class="bc">
+        @for (var i = 0; i < 30; i++)
+        {
+          var w = (i * 7) % 5 + 1;
+          <div style="width:@(w)px;height:60px"></div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center">
+    <a asp-controller="Perfil" asp-action="Historial" class="btn btn-primary">Ver mi historial</a>
+    &nbsp;
+    <a asp-controller="Home" asp-action="Index" class="btn btn-outline">Volver a cartelera</a>
+  </div>
+
+  <div style="margin-top:32px;text-align:center" class="t-meta">
+    Te enviamos un correo con los detalles y un recordatorio antes de la función.
+  </div>
+</div>

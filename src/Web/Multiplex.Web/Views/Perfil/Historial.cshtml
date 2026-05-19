@@ -1,0 +1,74 @@
+@model IReadOnlyCollection<RegistroHistorialDto>
+@{
+    ViewData["Title"] = "Historial — FRAME";
+    var co = System.Globalization.CultureInfo.GetCultureInfo("es-CO");
+    var total = Model.Where(r => r.EstadoPago.Equals("Aprobado", StringComparison.OrdinalIgnoreCase)).Sum(r => r.ValorTotal);
+}
+@section Styles {
+<style>
+.hist-wrap{max-width:1280px;margin:0 auto;padding:48px 40px}
+.hist-table{width:100%;border-collapse:collapse;background:var(--cream-warm);border:.5px solid var(--paper)}
+.hist-table th{font-family:var(--fm);font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--house);text-align:left;padding:14px 18px;border-bottom:.5px solid var(--paper)}
+.hist-table td{font-family:var(--fm);font-size:12px;padding:14px 18px;border-bottom:.5px solid var(--paper);vertical-align:middle}
+.hist-table tr:hover td{background:rgba(196,26,26,.04);cursor:pointer}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+.stat{background:var(--black);color:var(--cream);padding:22px 24px}
+.stat-value{font-family:var(--fd);font-size:42px;line-height:1}
+.stat-label{font-family:var(--fm);font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--house);margin-top:6px}
+</style>
+}
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="t-label" style="margin-bottom:8px">// Historial</div>
+    <div style="font-family:var(--fd);font-size:64px;color:var(--cream);text-transform:uppercase;line-height:.9">Mis órdenes</div>
+  </div>
+</div>
+<partial name="_Filmstrip" />
+
+<div class="hist-wrap">
+  <div class="stat-grid">
+    <div class="stat">
+      <div class="stat-value">@Model.Count</div>
+      <div class="stat-label">Transacciones</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">@total.ToString("C0", co)</div>
+      <div class="stat-label">Total aprobado</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">@Model.Count(r => r.EstadoPago.Equals("Aprobado", StringComparison.OrdinalIgnoreCase))</div>
+      <div class="stat-label">Aprobadas</div>
+    </div>
+  </div>
+
+  @if (Model.Count == 0)
+  {
+    <div class="alert alert-cream"><span class="alert-icon">›</span><div class="alert-msg">No hay transacciones registradas todavía. <a asp-controller="Home" asp-action="Index" style="color:var(--red)">Reservar una función →</a></div></div>
+  }
+  else
+  {
+    <table class="hist-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Orden</th>
+          <th>Estado</th>
+          <th style="text-align:right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var r in Model.OrderByDescending(x => x.Fecha))
+        {
+          var ok = r.EstadoPago.Equals("Aprobado", StringComparison.OrdinalIgnoreCase);
+          <tr>
+            <td>@r.Fecha.ToLocalTime().ToString("dd MMM yyyy · HH:mm", co)</td>
+            <td style="font-family:var(--fm);font-size:10px;color:var(--house)">@r.IdOrden.ToString().ToUpper().Substring(0, 18)</td>
+            <td><span class="tag @(ok ? "tag-black" : "tag-red")">@r.EstadoPago</span></td>
+            <td style="text-align:right;font-family:var(--fd);font-size:18px">@r.ValorTotal.ToString("C0", co)</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

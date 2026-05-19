@@ -1,0 +1,112 @@
+@model RegistroVm
+@{
+    ViewData["Title"] = "Registro — FRAME";
+}
+@section Styles {
+<style>
+.reg-layout{max-width:1280px;margin:0 auto;padding:64px 40px;display:grid;grid-template-columns:1fr 380px;gap:56px;align-items:start}
+.reg-title{font-family:var(--fd);font-size:72px;color:var(--black);text-transform:uppercase;line-height:.88;margin-bottom:12px}
+.reg-title em{color:var(--red);font-style:normal}
+.reg-sub{font-family:var(--fm);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--house);margin-bottom:40px;padding-bottom:24px;border-bottom:.5px solid var(--paper)}
+.info-panel{background:var(--black);padding:32px}
+.ip-title{font-family:var(--fd);font-size:28px;color:var(--cream);text-transform:uppercase;margin-bottom:20px}
+.ip-tier{border:.5px solid var(--void);padding:16px;margin-bottom:10px}
+.ip-tier-name{font-family:var(--fd);font-size:22px;color:var(--cream);text-transform:uppercase}
+.ip-tier-desc{font-family:var(--fm);font-size:9px;letter-spacing:.1em;color:var(--house);margin-top:4px;line-height:1.7}
+.ip-tier.featured{border-color:var(--red)}
+.ip-tier.featured .ip-tier-name{color:var(--red)}
+.field-section{font-family:var(--fm);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--red);margin:28px 0 16px;padding-bottom:8px;border-bottom:.5px solid var(--paper)}
+@@media(max-width:900px){.reg-layout{grid-template-columns:1fr}.info-panel{display:none}}
+@@media(max-width:600px){.reg-layout{padding:32px 20px}}
+</style>
+}
+
+<div class="reg-layout">
+  <div>
+    <div class="reg-title">Crea tu<br>cuenta<br><em>FRAME</em></div>
+    <div class="reg-sub">Acceso gratuito · Sin tarjeta de crédito</div>
+
+    <form method="post" asp-action="Registro">
+      @Html.AntiForgeryToken()
+      <div asp-validation-summary="ModelOnly" class="form-error" style="margin-bottom:16px"></div>
+
+      <div class="field-section">// Datos personales</div>
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label class="form-label">Nombre</label>
+          <input asp-for="Nombre" class="form-input" type="text" placeholder="Nombre" required />
+          <span asp-validation-for="Nombre" class="form-help form-error"></span>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Apellidos</label>
+          <input asp-for="Apellido" class="form-input" type="text" placeholder="Apellidos" required />
+          <span asp-validation-for="Apellido" class="form-help form-error"></span>
+        </div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label class="form-label">Tipo de documento</label>
+          <select asp-for="TipoDocumento" class="form-select">
+            <option value="@TipoDocumento.CC">Cédula de ciudadanía</option>
+            <option value="@TipoDocumento.CE">Cédula de extranjería</option>
+            <option value="@TipoDocumento.PAS">Pasaporte</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Número de documento</label>
+          <input asp-for="NumeroDocumento" class="form-input" type="text" placeholder="Ej: 1020456789" required />
+          <span asp-validation-for="NumeroDocumento" class="form-help form-error"></span>
+        </div>
+      </div>
+
+      <div class="field-section">// Acceso</div>
+      <div class="form-field">
+        <label class="form-label">Correo electrónico</label>
+        <input asp-for="Email" class="form-input" type="email" placeholder="hola@correo.com" required />
+        <div class="form-help">Recibirás tus boletas y confirmaciones aquí.</div>
+        <span asp-validation-for="Email" class="form-help form-error"></span>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label class="form-label">Contraseña</label>
+          <input asp-for="Password" class="form-input" type="password" placeholder="Mínimo 8 caracteres" minlength="8" required />
+          <span asp-validation-for="Password" class="form-help form-error"></span>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Confirmar contraseña</label>
+          <input asp-for="PasswordConfirm" class="form-input" type="password" placeholder="Repite tu contraseña" required />
+          <span asp-validation-for="PasswordConfirm" class="form-help form-error"></span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:16px">Crear cuenta</button>
+      <div style="margin-top:16px;text-align:center;font-family:var(--fm);font-size:11px;color:var(--house)">
+        ¿Ya tienes cuenta? <a asp-action="Login" style="color:var(--red);text-decoration:none;border-bottom:1px solid currentColor">Inicia sesión</a>
+      </div>
+    </form>
+  </div>
+  <aside>
+    <div class="info-panel">
+      <div class="ip-title">Beneficios de ser miembro</div>
+      <div class="ip-tier">
+        <div class="ip-tier-name">Normal</div>
+        <div class="ip-tier-desc">Gratis · Reservas online · Historial de compras</div>
+      </div>
+      <div class="ip-tier featured">
+        <div class="ip-tier-name">Oro</div>
+        <div class="ip-tier-desc">10% dcto. Lun–Mié · Reservas anticipadas 7 días · Sin cargo</div>
+      </div>
+      <div class="ip-tier">
+        <div class="ip-tier-name">Platino</div>
+        <div class="ip-tier-desc">20% dcto. todos los días · Combo incluido · Reservas 30 días · Sala VIP</div>
+      </div>
+      <div style="margin-top:20px">
+        <a asp-controller="Membresia" asp-action="Index" class="btn-ghost">Ver todos los beneficios →</a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+}

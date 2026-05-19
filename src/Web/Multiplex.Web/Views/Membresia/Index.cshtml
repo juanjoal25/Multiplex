@@ -1,0 +1,129 @@
+@model string
+@{
+    ViewData["Title"] = "Membresía — FRAME";
+    var nivel = Model ?? "Normal";
+    bool Is(string n) => string.Equals(nivel, n, StringComparison.OrdinalIgnoreCase);
+}
+@section Styles {
+<style>
+.hero{background:var(--black);padding:64px 0 56px;border-bottom:2px solid var(--red)}
+.hero-inner{max-width:1280px;margin:0 auto;padding:0 40px}
+.tiers-section{max-width:1280px;margin:0 auto;padding:56px 40px}
+.comparison-table{width:100%;border-collapse:collapse;margin-top:48px}
+.comparison-table th{font-family:var(--fd);font-size:24px;text-transform:uppercase;padding:20px 24px;text-align:left;border-bottom:2px solid var(--red)}
+.comparison-table th:first-child{font-family:var(--fm);font-size:9px;letter-spacing:.25em;color:var(--house);font-weight:400;border-bottom:.5px solid var(--paper)}
+.comparison-table td{padding:14px 24px;border-bottom:.5px solid var(--paper);font-family:var(--fm);font-size:11px}
+.comparison-table td:first-child{color:var(--house);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.check{color:var(--red);font-family:var(--fd);font-size:18px}
+.cross{color:var(--paper);font-size:14px}
+.faq-item{border-bottom:.5px solid var(--paper);padding:20px 0;cursor:pointer}
+.faq-q{font-family:var(--fd);font-size:20px;text-transform:uppercase;letter-spacing:.04em;display:flex;justify-content:space-between;align-items:center}
+.faq-a{font-family:var(--fm);font-size:12px;color:var(--shadow);line-height:1.7;margin-top:12px}
+</style>
+}
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="t-label" style="margin-bottom:12px">// Programa de membresía</div>
+    <div style="font-family:var(--fd);font-size:96px;color:var(--cream);text-transform:uppercase;line-height:.88">Tu pase<br>a todo</div>
+    <div style="font-family:var(--fm);font-size:11px;color:var(--house);margin-top:20px;max-width:500px;line-height:1.7">
+      Únete al programa de membresía de FRAME y disfruta de descuentos, acceso anticipado y beneficios exclusivos en cada función.
+      @if (User?.Identity?.IsAuthenticated ?? false)
+      {
+        <span style="display:block;margin-top:8px;color:var(--red)">Tu plan actual: @nivel.</span>
+      }
+    </div>
+  </div>
+</section>
+<partial name="_Filmstrip" />
+
+<div class="tiers-section">
+  <div class="grid-3">
+    <div class="tier-card@(Is("Normal") ? " current" : "")" style="background:var(--cream-warm)">
+      <div class="t-label" style="margin-bottom:10px">Normal</div>
+      <div class="tier-name">Normal</div>
+      <div class="tier-price" style="font-family:var(--fd);font-size:56px;color:var(--shadow);line-height:1">Gratis</div>
+      <div class="tier-price-period" style="margin-bottom:20px">Sin cargos mensuales</div>
+      <div class="divider-hair" style="margin-bottom:16px"></div>
+      <div class="tier-benefit">Reservas online sin límite</div>
+      <div class="tier-benefit">Historial de compras</div>
+      <div class="tier-benefit">Acceso a funciones especiales</div>
+      <div class="tier-benefit">Boletas digitales</div>
+      <div style="margin-top:20px">
+        @if (User?.Identity?.IsAuthenticated ?? false) {
+          <span class="btn btn-outline btn-full" style="opacity:.5">Plan @(Is("Normal") ? "actual" : "incluido")</span>
+        } else {
+          <a asp-controller="Auth" asp-action="Registro" class="btn btn-outline btn-full">Registrarse gratis</a>
+        }
+      </div>
+    </div>
+    <div class="tier-card@(Is("Oro") ? " current" : "")" style="background:var(--cream-warm)">
+      <div class="t-label" style="margin-bottom:10px">Oro</div>
+      <div class="tier-name">Oro</div>
+      <div class="tier-price">$29.900</div>
+      <div class="tier-price-period" style="margin-bottom:20px">por mes · cancela cuando quieras</div>
+      <div class="divider-hair" style="margin-bottom:16px"></div>
+      <div class="tier-benefit" style="color:var(--black)">10% de descuento Lun–Mié</div>
+      <div class="tier-benefit" style="color:var(--black)">Reservas con 7 días de antelación</div>
+      <div class="tier-benefit" style="color:var(--black)">Sin cargo por servicio online</div>
+      <div class="tier-benefit" style="color:var(--black)">Sala de espera premium</div>
+      <div style="margin-top:20px">
+        @if (Is("Oro")) {
+          <span class="btn btn-outline btn-full" style="opacity:.5">Plan actual</span>
+        } else {
+          <a href="#" class="btn btn-outline btn-full">Mejorar a Oro</a>
+        }
+      </div>
+    </div>
+    <div class="tier-card@(Is("Platino") ? " current" : "")" style="background:var(--black);color:var(--cream)">
+      <div style="font-family:var(--fm);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--red);margin-bottom:10px">Platino</div>
+      <div class="tier-name" style="color:var(--cream)">Platino</div>
+      <div class="tier-price">$59.900</div>
+      <div class="tier-price-period" style="margin-bottom:20px">por mes · cancela cuando quieras</div>
+      <div class="divider-void" style="margin-bottom:16px"></div>
+      <div class="tier-benefit" style="color:var(--paper)">20% de descuento todos los días</div>
+      <div class="tier-benefit" style="color:var(--paper)">Reservas con 30 días de antelación</div>
+      <div class="tier-benefit" style="color:var(--paper)">Combo confitería incluido mensual</div>
+      <div class="tier-benefit" style="color:var(--paper)">Acceso a Sala VIP</div>
+      <div style="margin-top:20px">
+        @if (Is("Platino")) {
+          <span class="btn btn-primary btn-full" style="opacity:.6">Plan actual</span>
+        } else {
+          <a href="#" class="btn btn-primary btn-full">Mejorar a Platino</a>
+        }
+      </div>
+    </div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Normal</th><th>Oro</th><th style="color:var(--red)">Platino</th></tr></thead>
+    <tbody>
+      <tr><td>Descuento en boletas</td><td class="cross">—</td><td>10% Lun–Mié</td><td style="color:var(--red)">20% todos los días</td></tr>
+      <tr><td>Reserva anticipada</td><td class="cross">Hasta 3 días</td><td>Hasta 7 días</td><td style="color:var(--red)">Hasta 30 días</td></tr>
+      <tr><td>Cargo por servicio</td><td>$3.000</td><td class="check">Sin cargo</td><td class="check" style="color:var(--red)">Sin cargo</td></tr>
+      <tr><td>Combo mensual incluido</td><td class="cross">No</td><td class="cross">No</td><td class="check" style="color:var(--red)">1 vez/mes</td></tr>
+      <tr><td>Sala VIP</td><td class="cross">No</td><td class="cross">No</td><td class="check" style="color:var(--red)">Sí</td></tr>
+      <tr><td>Estrenos y preestrenos</td><td class="cross">No</td><td class="check">Sí</td><td class="check" style="color:var(--red)">Prioritario</td></tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:64px">
+    <div style="font-family:var(--fd);font-size:36px;text-transform:uppercase;margin-bottom:24px">Preguntas frecuentes</div>
+    <div class="faq-item">
+      <div class="faq-q" data-faq-q>¿Puedo cancelar mi membresía en cualquier momento? <span>+</span></div>
+      <div class="faq-a" hidden>Sí. Puedes cancelar tu membresía Oro o Platino en cualquier momento desde la configuración de tu cuenta. No hay penalidades por cancelación.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" data-faq-q>¿El descuento se aplica automáticamente? <span>+</span></div>
+      <div class="faq-a" hidden>Sí. Al iniciar sesión, el sistema detecta tu nivel y aplica el descuento durante el proceso de pago.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" data-faq-q>¿Cómo funciona el combo mensual de Platino? <span>+</span></div>
+      <div class="faq-a" hidden>Una vez al mes puedes canjear un combo de confitería de forma gratuita. El cupón se genera el primer día del mes.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" data-faq-q>¿Puedo tener membresía corporativa? <span>+</span></div>
+      <div class="faq-a" hidden>Sí. Ofrecemos planes corporativos para empresas. Contáctanos a través de la sección de alquiler.</div>
+    </div>
+  </div>
+</div>

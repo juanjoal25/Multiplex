@@ -1,0 +1,83 @@
+@{
+    var active = ViewData["AdminActive"] as string ?? "peliculas";
+    string Lk(string key) => key == active ? "admin-link active" : "admin-link";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>@(ViewData["Title"] ?? "Admin — FRAME")</title>
+  <link rel="stylesheet" href="~/css/colors_and_type.css" />
+  <link rel="stylesheet" href="~/css/style.css" />
+  @RenderSection("Styles", required: false)
+</head>
+<body style="background:var(--black)">
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-logo">FRAME<span>·</span></a>
+    <div class="nav-links">
+      <a asp-area="Admin" asp-controller="Peliculas" asp-action="Index" class="@(active=="peliculas"?"nav-link active":"nav-link")">Películas</a>
+      <a asp-area="Admin" asp-controller="Funciones" asp-action="Index" class="@(active=="funciones"?"nav-link active":"nav-link")">Funciones</a>
+      <a asp-area="Admin" asp-controller="Salas" asp-action="Index" class="@(active=="salas"?"nav-link active":"nav-link")">Salas</a>
+      <a asp-area="Admin" asp-controller="Contratos" asp-action="Index" class="@(active=="contratos"?"nav-link active":"nav-link")">Contratos</a>
+      <a asp-area="Admin" asp-controller="Financiero" asp-action="Index" class="@(active=="financiero"?"nav-link active":"nav-link")">Financiero</a>
+    </div>
+    <div class="nav-right">
+      <span style="font-family:var(--fm);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--house)">Admin · @User?.GetDisplayName()</span>
+      <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" style="margin:0">
+        <button class="nav-user" type="submit" style="background:var(--red);border:1px solid var(--cream);cursor:pointer" title="Salir">
+          <svg viewBox="0 0 16 16" fill="none" stroke="var(--cream)" stroke-width="1.5">
+            <path d="M6 8h7M11 6l2 2-2 2"/><path d="M8 3H3v10h5"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+</nav>
+<partial name="_Filmstrip" />
+
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-section">Programación</div>
+    <a asp-area="Admin" asp-controller="Peliculas" asp-action="Index" class="@Lk("peliculas")">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10"/><path d="M5 3v10M11 3v10"/></svg>Películas
+    </a>
+    <a asp-area="Admin" asp-controller="Funciones" asp-action="Index" class="@Lk("funciones")">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>Funciones
+    </a>
+    <div class="admin-sidebar-section">Infraestructura</div>
+    <a asp-area="Admin" asp-controller="Salas" asp-action="Index" class="@Lk("salas")">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="8"/><path d="M4 4V2M12 4V2M1 9h14"/></svg>Salas
+    </a>
+    <div class="admin-sidebar-section">Comercial</div>
+    <a asp-area="Admin" asp-controller="Contratos" asp-action="Index" class="@Lk("contratos")">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2h8l2 2v10H2V4z"/><path d="M5 7h6M5 10h4"/></svg>Contratos
+    </a>
+    <a asp-area="Admin" asp-controller="Financiero" asp-action="Index" class="@Lk("financiero")">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12V4l6-2 6 2v8l-6 2z"/></svg>Financiero
+    </a>
+    <div class="admin-sidebar-section" style="margin-top:32px">Acceso rápido</div>
+    <a asp-area="" asp-controller="Home" asp-action="Index" class="admin-link">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8L8 2l6 6"/><path d="M4 6v7h8V6"/></svg>Ver sitio
+    </a>
+    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" style="margin:0">
+      <button type="submit" class="admin-link" style="background:none;border:none;color:var(--red-muted);width:100%;text-align:left;cursor:pointer">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8h7M11 6l2 2-2 2"/><path d="M8 3H3v10h5"/></svg>Salir
+      </button>
+    </form>
+  </aside>
+  <main class="admin-main">
+    @if (TempData["Flash"] is string flash && !string.IsNullOrWhiteSpace(flash))
+    {
+      <div class="alert alert-cream" style="margin-bottom:20px"><span class="alert-icon">›</span><div class="alert-msg">@flash</div></div>
+    }
+    @RenderBody()
+  </main>
+</div>
+
+<script src="~/js/site.js" defer></script>
+@RenderSection("Scripts", required: false)
+</body>
+</html>

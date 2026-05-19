@@ -1,0 +1,93 @@
+@model AlquilerVm
+@{
+    ViewData["Title"] = "Alquiler de salas — FRAME";
+    var form = Model.Form ?? new AlquilerInput();
+}
+@section Styles {
+<style>
+.alq-wrap{max-width:1280px;margin:0 auto;padding:48px 40px;display:grid;grid-template-columns:1fr 360px;gap:36px;align-items:start}
+.salas-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
+.sala-pick{background:var(--black);color:var(--cream);padding:24px;cursor:pointer;border:2px solid transparent}
+.sala-pick.selected{border-color:var(--red)}
+.sala-pick input{display:none}
+@@media(max-width:900px){.alq-wrap{grid-template-columns:1fr}.salas-strip{grid-template-columns:1fr 1fr}}
+</style>
+}
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="t-label" style="margin-bottom:8px">// Eventos corporativos</div>
+    <div style="font-family:var(--fd);font-size:72px;color:var(--cream);text-transform:uppercase;line-height:.9">Alquila<br><em style="color:var(--red);font-style:normal">una sala</em></div>
+    <div style="font-family:var(--fm);font-size:11px;color:var(--house);margin-top:18px;max-width:520px;line-height:1.7">Lanzamientos de producto, preestrenos privados, funciones corporativas o cine educativo. Tus invitados, tu pantalla, tu noche.</div>
+  </div>
+</div>
+<partial name="_Filmstrip" />
+
+<form method="post" asp-action="Solicitar">
+  @Html.AntiForgeryToken()
+  <div class="alq-wrap">
+    <div>
+      <div class="t-label" style="margin-bottom:8px">// Elige una sala</div>
+      <div class="salas-strip">
+        @foreach (var s in Model.Salas)
+        {
+          <label class="sala-pick">
+            <input type="radio" name="IdSala" value="@s.Id" />
+            <div style="font-family:var(--fd);font-size:24px;text-transform:uppercase">@s.Nombre</div>
+            <div class="t-meta" style="color:var(--house);margin-top:4px">@s.Tipo · Aforo @s.Aforo</div>
+            <div class="t-meta" style="color:var(--red);margin-top:10px">@s.Estado</div>
+          </label>
+        }
+      </div>
+
+      <div style="margin-top:32px">
+        <div class="t-label" style="margin-bottom:8px">// Datos del evento</div>
+        <div asp-validation-summary="ModelOnly" class="form-error" style="margin-bottom:14px"></div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Razón social / tercero</label>
+            <input asp-for="@form.Tercero" name="Tercero" class="form-input" type="text" placeholder="Empresa o nombre" required />
+          </div>
+          <div class="form-field">
+            <label class="form-label">Correo de contacto</label>
+            <input asp-for="@form.ContactoEmail" name="ContactoEmail" class="form-input" type="email" placeholder="hola@empresa.com" required />
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Fecha de inicio</label>
+            <input asp-for="@form.FechaInicio" name="FechaInicio" class="form-input" type="date" required />
+          </div>
+          <div class="form-field">
+            <label class="form-label">Fecha de fin</label>
+            <input asp-for="@form.FechaFin" name="FechaFin" class="form-input" type="date" required />
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Notas</label>
+          <textarea asp-for="@form.Notas" name="Notas" class="form-input" rows="4" placeholder="Cuéntanos sobre el evento, número de invitados, hora aproximada..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <div class="summary-box">
+        <div class="summary-title">¿Por qué FRAME?</div>
+        <div class="summary-row"><div class="summary-key">Salas</div><div class="summary-val">IMAX · 4DX · VIP</div></div>
+        <div class="summary-row"><div class="summary-key">Aforo máx.</div><div class="summary-val">@(Model.Salas.Max(s => s.Aforo)) personas</div></div>
+        <div class="summary-row"><div class="summary-key">Catering</div><div class="summary-val">Disponible</div></div>
+        <div class="summary-row"><div class="summary-key">Respuesta</div><div class="summary-val">24h hábiles</div></div>
+        <div style="margin-top:18px">
+          @if (User?.Identity?.IsAuthenticated ?? false)
+          {
+            <button type="submit" class="btn btn-primary btn-full">Enviar solicitud</button>
+          }
+          else
+          {
+            <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="/alquiler" class="btn btn-primary btn-full">Inicia sesión para solicitar</a>
+          }
+        </div>
+      </div>
+    </aside>
+  </div>
+</form>

@@ -1,0 +1,104 @@
+@model IReadOnlyCollection<PeliculaSummary>
+@{
+    ViewData["Title"] = "Películas — Admin FRAME";
+    ViewData["AdminActive"] = "peliculas";
+}
+@section Styles {
+<style>
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--black);border:1px solid var(--void);padding:36px;width:640px;max-height:90vh;overflow-y:auto;border-top:3px solid var(--red)}
+.modal-title{font-family:var(--fd);font-size:32px;color:var(--cream);text-transform:uppercase;margin-bottom:24px}
+.movie-poster-admin{width:48px;height:60px;background:var(--void);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:10px;color:var(--house);text-align:center}
+</style>
+}
+
+<div class="admin-page-header">
+  <div>
+    <div class="admin-eyebrow">// Gestión de películas</div>
+    <div class="admin-page-title">Películas</div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <button class="btn btn-primary btn-sm" data-modal-open="modalNueva">+ Nueva película</button>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px">
+  <div class="stat-card"><div class="stat-value">@Model.Count(p => p.Estado == "Cartelera")</div><div class="stat-label">En cartelera</div></div>
+  <div class="stat-card"><div class="stat-value">@Model.Count(p => p.Estado == "Proximamente")</div><div class="stat-label">Próximamente</div></div>
+  <div class="stat-card"><div class="stat-value">@Model.Count</div><div class="stat-label">Total catálogo</div></div>
+  <div class="stat-card"><div class="stat-value">@Model.Sum(p => p.DuracionMinutos)</div><div class="stat-label">Min totales</div></div>
+</div>
+
+<table class="data-table">
+  <thead>
+    <tr><th></th><th>Título</th><th>Género</th><th>Duración</th><th>Clasificación</th><th>Formato</th><th>Estado</th><th>Acciones</th></tr>
+  </thead>
+  <tbody>
+    @foreach (var p in Model)
+    {
+      var iniciales = string.Concat(p.Titulo.Split(' ').Where(w => w.Length > 0).Take(3).Select(w => w[0])).ToUpper();
+      <tr>
+        <td><div class="movie-poster-admin">@iniciales</div></td>
+        <td style="font-family:var(--fd);font-size:16px;color:var(--cream)">@p.Titulo</td>
+        <td>@p.Genero</td>
+        <td>@p.DuracionMinutos min</td>
+        <td><span class="tag tag-void">@p.Clasificacion</span></td>
+        <td>@p.Formato</td>
+        <td><span class="tag @(p.Estado == "Cartelera" ? "tag-green" : "tag-amber")">@p.Estado</span></td>
+        <td>
+          <div class="table-actions">
+            <a href="#" class="tbl-btn">Ver</a>
+            <a href="#" class="tbl-btn">Editar</a>
+            <a href="#" class="tbl-btn danger">Archivar</a>
+          </div>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+<div class="modal-overlay" id="modalNueva">
+  <div class="modal">
+    <div class="modal-title">Nueva Película</div>
+    <form method="post" asp-action="Nueva">
+      @Html.AntiForgeryToken()
+      <div class="form-grid-2" style="gap:16px">
+        <div class="form-field">
+          <label class="form-label" style="color:var(--house)">Título</label>
+          <input class="form-input dark" name="Titulo" type="text" placeholder="Título de la película" required />
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="color:var(--house)">Género</label>
+          <input class="form-input dark" name="Genero" type="text" placeholder="Drama, Thriller..." required />
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="color:var(--house)">Duración (min)</label>
+          <input class="form-input dark" name="DuracionMinutos" type="number" min="1" max="300" value="120" required />
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="color:var(--house)">Clasificación</label>
+          <select name="Clasificacion" class="form-select" style="background-color:var(--void);color:var(--cream);border-color:var(--shadow)">
+            @foreach (Clasificacion c in Enum.GetValues<Clasificacion>())
+            {
+              <option value="@c">@c</option>
+            }
+          </select>
+        </div>
+        <div class="form-field" style="grid-column:1/-1">
+          <label class="form-label" style="color:var(--house)">Formato</label>
+          <select name="Formato" class="form-select" style="background-color:var(--void);color:var(--cream);border-color:var(--shadow)">
+            @foreach (TipoFormato f in Enum.GetValues<TipoFormato>())
+            {
+              <option value="@f">@f</option>
+            }
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:24px;justify-content:flex-end">
+        <button type="button" class="btn btn-outline-light" data-modal-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">Crear película</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  
+  <rect width="80" height="80" fill="#0D0C0B"></rect>
+  
+  <path d="M 8 12 L 24 12 L 24 16 L 12 16 L 12 28 L 8 28 Z" fill="#C41A1A"></path>
+  <path d="M 72 12 L 56 12 L 56 16 L 68 16 L 68 28 L 72 28 Z" fill="#C41A1A"></path>
+  <path d="M 8 68 L 24 68 L 24 64 L 12 64 L 12 52 L 8 52 Z" fill="#C41A1A"></path>
+  <path d="M 72 68 L 56 68 L 56 64 L 68 64 L 68 52 L 72 52 Z" fill="#C41A1A"></path>
+  
+  <text x="40" y="56" font-family="Bebas Neue, Oswald, Arial Narrow, sans-serif" font-size="44" fill="#F2EDE6" text-anchor="middle" letter-spacing="0">F</text>
+</svg>
