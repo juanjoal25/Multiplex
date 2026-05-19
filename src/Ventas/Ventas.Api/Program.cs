@@ -18,6 +18,7 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<VentasDbContext>();
     db.Database.EnsureCreated();
+    await DataSeeder.SeedAsync(db);
 }
 app.UseHttpsRedirection();
 app.MapControllers();
