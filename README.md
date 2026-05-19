@@ -115,48 +115,204 @@ Multiplex/
 
 ## Requisitos
 
-- **.NET 10 SDK** (preview)
-- **Docker Desktop** (Postgres 16 + RabbitMQ 3.13)
-- (Opcional) **pgAdmin** está incluido en el `docker-compose` (http://localhost:5050)
+### Obligatorios
+- **.NET 10 SDK** (versión 10.0 o superior)  
+  Descargar desde: https://dotnet.microsoft.com/download/dotnet/10.0
+- **Docker Desktop** (con Docker Engine y Docker Compose)  
+  Descargar desde: https://www.docker.com/products/docker-desktop
+- **Git** (para clonar/actualizar el repositorio)
+
+### Opcionales pero recomendados
+- **pgAdmin** (UI para PostgreSQL) — incluido en `docker-compose.yml`
+- **RabbitMQ Management UI** (monitoreo de colas) — incluido en `docker-compose.yml`
+
+### Verificar requisitos instalados
+
+```bash
+dotnet --version                    # Debe ser 10.x.x
+docker --version                    # Debe existir
+docker compose version              # Debe existir (no docker-compose)
+git --version                        # Debe existir
+```
 
 ---
 
-## Puesta en marcha
+## Puesta en marcha (Guía paso a paso)
 
-### 1. Levantar infraestructura local
+### Paso 1: Clonar o actualizar el repositorio
 
 ```bash
-docker compose up -d postgres rabbitmq
+# Si es primera vez:
+git clone <repo-url> && cd Multiplex
+
+# Si ya está clonado:
+git pull origin main
 ```
 
-Esto crea las 6 bases de datos vía `docker/postgres-init.sql`:
-- `multiplex_clientes`, `multiplex_programacion`, `multiplex_infraestructura`, `multiplex_ventas`, `multiplex_financiero`, `multiplex_cadena`.
-
-RabbitMQ management UI: http://localhost:15672 (user/pass: `multiplex`/`multiplex`).
-
-### 2. Compilar la solución
+### Paso 2: Verificar estructura del proyecto
 
 ```bash
+# Desde la raíz del repositorio
+ls -la Multiplex.slnx docker-compose.yml docker/postgres-init.sql src/
+```
+
+Deberías ver:
+- `Multiplex.slnx` — archivo solución
+- `docker-compose.yml` — orquestación de servicios
+- `docker/postgres-init.sql` — script de inicialización de BDs
+- `src/` — directorio con los 6 microservicios
+
+### Paso 3: Levantar infraestructura local (Docker)
+
+En una terminal, desde la **raíz del repositorio**:
+
+```bash
+docker compose up -d
+```
+
+Esto inicia:
+- **PostgreSQL 16** (`multiplex-postgres` en `localhost:5432`)
+- **RabbitMQ 3.13** (`multiplex-rabbitmq` en `localhost:5672`)
+- **pgAdmin** (`multiplex-pgadmin` en `http://localhost:5050`)
+
+**Credenciales por defecto:**
+```
+PostgreSQL:
+  Usuario: multiplex
+  Contraseña: multiplex
+  Base datos principal: postgres
+  
+RabbitMQ:
+  Usuario: multiplex
+  Contraseña: multiplex
+  
+pgAdmin:
+  Usuario: admin@multiplex.local
+  Contraseña: admin
+```
+
+**Bases de datos creadas automáticamente:**
+- `multiplex_clientes`
+- `multiplex_programacion`
+- `multiplex_infraestructura`
+- `multiplex_ventas`
+- `multiplex_financiero`
+- `multiplex_cadena`
+
+**Verificar que los servicios estén sanos:**
+
+```bash
+docker compose ps
+```
+
+Esperar a que los `healthcheck` pasen (status=healthy). Puede tardar 20-30 segundos.
+
+### Paso 4: Restaurar dependencias y compilar
+
+```bash
+# Desde la raíz del repositorio
+dotnet restore Multiplex.slnx
 dotnet build Multiplex.slnx
 ```
 
-### 3. Ejecutar los 6 microservicios
+Si todo es correcto, deberías ver `Build succeeded`.
 
-En 6 terminales separadas (o vía `tmux`/`Windows Terminal split panes`):
+### Paso 5: Ejecutar los 6 microservicios
 
+Necesitas **6 terminales separadas**. Desde la **raíz del repositorio**, en cada una ejecuta:
+
+**Terminal 1 — Clientes**
 ```bash
-dotnet run --project src/Clientes/Clientes.Api               # → http://localhost:5001
-dotnet run --project src/Programacion/Programacion.Api       # → http://localhost:5002
-dotnet run --project src/Infraestructura/Infraestructura.Api # → http://localhost:5003
-dotnet run --project src/Ventas/Ventas.Api                   # → http://localhost:5004
-dotnet run --project src/Financiero/Financiero.Api           # → http://localhost:5005
-dotnet run --project src/Cadena/Cadena.Api                   # → http://localhost:5006
+dotnet run --project src/Clientes/Clientes.Api
+# Esperado: listening on http://localhost:5001
 ```
 
-Cada API:
-- En desarrollo, ejecuta `EnsureCreated()` al arranque (crea el schema y las tablas).
-- Expone OpenAPI en `/openapi/v1.json`.
-- Aplica `DomainExceptionFilter` para mapear excepciones del dominio a códigos HTTP semánticos.
+**Terminal 2 — Programación**
+```bash
+dotnet run --project src/Programacion/Programacion.Api
+# Esperado: listening on http://localhost:5002
+```
+
+**Terminal 3 — Infraestructura**
+```bash
+dotnet run --project src/Infraestructura/Infraestructura.Api
+# Esperado: listening on http://localhost:5003
+```
+
+**Terminal 4 — Ventas**
+```bash
+dotnet run --project src/Ventas/Ventas.Api
+# Esperado: listening on http://localhost:5004
+```
+
+**Terminal 5 — Financiero**
+```bash
+dotnet run --project src/Financiero/Financiero.Api
+# Esperado: listening on http://localhost:5005
+```
+
+**Terminal 6 — Cadena**
+```bash
+dotnet run --project src/Cadena/Cadena.Api
+# Esperado: listening on http://localhost:5006
+```
+
+### Paso 6: Verificar que todo funciona
+
+**OpenAPI de cada servicio:**
+- Clientes: http://localhost:5001/openapi/v1.json
+- Programación: http://localhost:5002/openapi/v1.json
+- Infraestructura: http://localhost:5003/openapi/v1.json
+- Ventas: http://localhost:5004/openapi/v1.json
+- Financiero: http://localhost:5005/openapi/v1.json
+- Cadena: http://localhost:5006/openapi/v1.json
+
+**Monitoreo:**
+- PostgreSQL (pgAdmin): http://localhost:5050
+- RabbitMQ (Management UI): http://localhost:15672
+
+**Test rápido (Curl o Postman):**
+```bash
+# Registrar un cliente
+curl -X POST http://localhost:5001/v1/clientes/registro \
+  -H "Content-Type: application/json" \
+  -d '{"documento":"12345678","email":"test@example.com","nombre":"Test User"}'
+
+# Consultar cartelera
+curl http://localhost:5002/v1/programacion/cartelera
+
+# Consultar configuración
+curl http://localhost:5006/v1/cadena/configuracion/00000000-0000-0000-0000-000000000000
+```
+
+### Paso 7: Detener los servicios
+
+Para parar todo:
+
+```bash
+# Parar los contenedores Docker
+docker compose down
+
+# Parar los microservicios: Ctrl+C en cada terminal
+```
+
+Para limpiar volúmenes de datos (restaurar estado limpio):
+
+```bash
+docker compose down -v
+docker compose up -d  # Reiniciar con BDs vacías
+```
+
+---
+
+## Comportamiento automático de las APIs
+
+Cada API al arrancar:
+- Ejecuta `EnsureCreated()` (crea schema + tablas si no existen)
+- Registra `DomainExceptionFilter` (mapea excepciones a HTTP semánticos)
+- Expone OpenAPI en `/openapi/v1.json`
+- Conecta con RabbitMQ y suscribe a eventos asíncronos
+- Inicia `BackgroundService` (schedulers de expiración, vigencia, etc.)
 
 ---
 
