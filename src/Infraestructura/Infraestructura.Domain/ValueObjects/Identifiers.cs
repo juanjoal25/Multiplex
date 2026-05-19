@@ -26,6 +26,7 @@ public sealed class Posicion : ValueObject
 {
     public string Fila { get; }
     public int Columna { get; }
+    private Posicion() { Fila = null!; }
     private Posicion(string fila, int columna) { Fila = fila; Columna = columna; }
     public static Posicion Of(string fila, int columna)
     {
@@ -40,6 +41,7 @@ public sealed class Posicion : ValueObject
 public sealed class Aforo : ValueObject
 {
     public int Valor { get; }
+    private Aforo() { }
     private Aforo(int v) => Valor = v;
     public static Aforo Of(int v)
     {
@@ -55,6 +57,7 @@ public enum TipoSilla { General, Vip, Especial, Acompanante }
 public sealed class ReservaExpiracion : ValueObject
 {
     public DateTime Valor { get; }
+    private ReservaExpiracion() { }
     private ReservaExpiracion(DateTime v) => Valor = v;
     public static ReservaExpiracion Of(DateTime v, DateTime ahora)
     {

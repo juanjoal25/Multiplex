@@ -30,7 +30,7 @@ public sealed class ProgramarFuncionHandler(
         var tipoStr = await infra.TipoSalaAsync(cmd.IdSala, ct);
         var tipoSala = Enum.TryParse<TipoSala>(tipoStr, true, out var ts) ? ts : (TipoSala?)null;
 
-        var horario = RangoHorario.Of(cmd.Inicio, cmd.Fin);
+        var horario = RangoHorario.Of(cmd.Inicio.ToUniversalTime(), cmd.Fin.ToUniversalTime());
         var existentes = await funcRepo.GetByVigentesEnSalaAsync(cmd.IdSala, ct);
         var sala = SalaRef.Of(cmd.IdSala, tipoSala);
         if (!validacion.ValidarDisponibilidadSala(sala, horario, existentes))
@@ -39,7 +39,6 @@ public sealed class ProgramarFuncionHandler(
         var formato = FormatoFactory.FromTipo(cmd.Formato);
         var func = Funcion.Programar(PeliculaRef.Of(pel.Id), sala, horario, formato);
         await funcRepo.AddAsync(func, ct);
-        await uow.SaveChangesAsync(ct);
 
         foreach (var e in func.DomainEvents.OfType<DomainEvents.FuncionProgramadaEvento>())
             await publisher.PublishAsync(new Messaging.Contracts.Programacion.FuncionProgramada(
@@ -47,6 +46,7 @@ public sealed class ProgramarFuncionHandler(
                 e.Horario.Inicio, e.Horario.Fin, e.Formato.ToString())
             { OccurredOn = e.OccurredOn }, ct);
 
+        await uow.SaveChangesAsync(ct);
         func.ClearEvents();
         return func.Id.Value;
     }

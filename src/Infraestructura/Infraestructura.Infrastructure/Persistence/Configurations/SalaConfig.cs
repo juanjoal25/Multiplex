@@ -17,7 +17,7 @@ public sealed class SalaConfig : IEntityTypeConfiguration<Sala>
         b.Property(x => x.Tipo).HasConversion<string>().HasMaxLength(20);
         b.OwnsOne(x => x.Aforo, a => a.Property(p => p.Valor).HasColumnName("aforo"));
         b.Ignore(x => x.Estado);
-        b.Property<EstadoSalaTipo>("EstadoTipo").HasColumnName("estado").HasConversion<string>().HasMaxLength(20).IsRequired();
+        b.Property<EstadoSalaTipo>("_estadoTipo").HasField("_estadoTipo").HasColumnName("estado").HasConversion<string>().HasMaxLength(20).IsRequired();
 
         b.OwnsMany(x => x.Sillas, s =>
         {
@@ -32,7 +32,7 @@ public sealed class SalaConfig : IEntityTypeConfiguration<Sala>
             });
             s.Property(x => x.Tipo).HasConversion<string>().HasMaxLength(20);
             s.Ignore(x => x.Estado);
-            s.Property<EstadoSillaTipo>("EstadoTipo").HasColumnName("estado").HasConversion<string>().HasMaxLength(20).IsRequired();
+            s.Property<EstadoSillaTipo>("_estadoTipo").HasField("_estadoTipo").HasColumnName("estado").HasConversion<string>().HasMaxLength(20).IsRequired();
             s.OwnsOne(x => x.ReservaExpiracion, r => r.Property(z => z.Valor).HasColumnName("reserva_expiracion"));
             s.Property(x => x.IdFuncionReservada).HasColumnName("id_funcion_reservada");
             s.Property(x => x.IdOrdenReservada).HasColumnName("id_orden_reservada");

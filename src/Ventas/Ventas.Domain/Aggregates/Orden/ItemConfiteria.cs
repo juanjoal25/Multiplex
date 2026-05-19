@@ -39,6 +39,7 @@ public sealed class ItemConfiteria : Entity<Guid>
     public Money PrecioUnitario { get; private set; }
     public Combo? Combo { get; private set; }
 
+    private ItemConfiteria() { ProductoId = null!; PrecioUnitario = null!; }
     private ItemConfiteria(Guid id, ProductoId producto, int cantidad, Money precio, Combo? combo) : base(id)
     {
         ProductoId = producto; Cantidad = cantidad; PrecioUnitario = precio; Combo = combo;

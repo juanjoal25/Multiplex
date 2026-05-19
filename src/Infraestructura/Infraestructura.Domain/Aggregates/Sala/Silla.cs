@@ -7,16 +7,20 @@ namespace Infraestructura.Domain.Aggregates.SalaAgg;
 
 public sealed class Silla : Entity<SillaId>
 {
+    private EstadoSillaTipo _estadoTipo;
+
     public Posicion Posicion { get; private set; }
     public TipoSilla Tipo { get; private set; }
-    public IEstadoSilla Estado { get; private set; }
+    public IEstadoSilla Estado => EstadoSillaFactory.FromTipo(_estadoTipo);
     public ReservaExpiracion? ReservaExpiracion { get; private set; }
     public Guid? IdFuncionReservada { get; private set; }
     public Guid? IdOrdenReservada { get; private set; }
 
+    private Silla() { Posicion = null!; }
+
     private Silla(SillaId id, Posicion pos, TipoSilla tipo, IEstadoSilla estado, ReservaExpiracion? exp, Guid? funcion, Guid? orden) : base(id)
     {
-        Posicion = pos; Tipo = tipo; Estado = estado;
+        Posicion = pos; Tipo = tipo; _estadoTipo = estado.Tipo;
         ReservaExpiracion = exp; IdFuncionReservada = funcion; IdOrdenReservada = orden;
     }
 
@@ -29,7 +33,7 @@ public sealed class Silla : Entity<SillaId>
     internal void Reservar(Guid idFuncion, Guid idOrden, ReservaExpiracion expiracion)
     {
         if (idOrden == Guid.Empty) throw new PreconditionFailedException("idOrden requerido");
-        Estado = Estado.Reservar();
+        _estadoTipo = Estado.Reservar().Tipo;
         ReservaExpiracion = expiracion;
         IdFuncionReservada = idFuncion;
         IdOrdenReservada = idOrden;
@@ -39,17 +43,17 @@ public sealed class Silla : Entity<SillaId>
     {
         if (IdFuncionReservada != idFuncion)
             throw new PreconditionFailedException("idFuncion no coincide con la reserva");
-        Estado = Estado.Ocupar();
+        _estadoTipo = Estado.Ocupar().Tipo;
     }
 
     internal void Liberar()
     {
-        Estado = Estado.Liberar();
+        _estadoTipo = Estado.Liberar().Tipo;
         ReservaExpiracion = null;
         IdFuncionReservada = null;
         IdOrdenReservada = null;
     }
 
     public bool ReservaHaExpirado(DateTime ahora) =>
-        Estado.Tipo == EstadoSillaTipo.Reservada && ReservaExpiracion is not null && ReservaExpiracion.HaExpirado(ahora);
+        _estadoTipo == EstadoSillaTipo.Reservada && ReservaExpiracion is not null && ReservaExpiracion.HaExpirado(ahora);
 }

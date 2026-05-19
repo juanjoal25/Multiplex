@@ -17,6 +17,7 @@ public sealed class Alquiler : AggregateRoot<AlquilerId>
     public EstadoAlquiler Estado { get; private set; }
     public int CapacidadReservada { get; private set; }
 
+    private Alquiler() { SalaRef = null!; Rango = null!; Solicitante = null!; }
     private Alquiler(AlquilerId id, SalaRef sala, RangoHorario rango, string solicitante, PropositoAlquiler prop, EstadoAlquiler est, int cap) : base(id)
     {
         SalaRef = sala; Rango = rango; Solicitante = solicitante; Proposito = prop; Estado = est; CapacidadReservada = cap;

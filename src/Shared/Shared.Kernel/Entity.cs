@@ -11,6 +11,8 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>
         Id = id;
     }
 
+    protected Entity() { Id = default!; }
+
     public bool Equals(Entity<TId>? other) =>
         other is not null && EqualityComparer<TId>.Default.Equals(Id, other.Id);
 

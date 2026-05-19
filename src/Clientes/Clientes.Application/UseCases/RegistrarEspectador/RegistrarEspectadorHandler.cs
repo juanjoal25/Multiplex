@@ -27,12 +27,12 @@ public sealed class RegistrarEspectadorHandler(
         var nombre = NombreCompleto.Of(cmd.Nombre, cmd.Apellido);
         var esp = Espectador.Registrar(nombre, email, doc);
         await repo.AddAsync(esp, ct);
-        await uow.SaveChangesAsync(ct);
 
         foreach (var evt in esp.DomainEvents.OfType<DomainEvents.EspectadorRegistrado>())
             await publisher.PublishAsync(new Messaging.Contracts.Clientes.EspectadorRegistrado(
                 evt.IdEspectador.Value, evt.Nivel.ToString(), evt.OccurredOn), ct);
 
+        await uow.SaveChangesAsync(ct);
         esp.ClearEvents();
         return new RegistrarEspectadorResult(esp.Id.Value);
     }

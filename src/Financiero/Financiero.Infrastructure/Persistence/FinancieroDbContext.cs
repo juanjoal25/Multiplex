@@ -13,8 +13,6 @@ public sealed class FinancieroDbContext(DbContextOptions<FinancieroDbContext> op
         base.OnModelCreating(mb);
         mb.HasDefaultSchema("financiero");
         mb.ApplyConfigurationsFromAssembly(typeof(FinancieroDbContext).Assembly);
-        mb.AddInboxStateEntity();
-        mb.AddOutboxMessageEntity();
-        mb.AddOutboxStateEntity();
+        // Outbox/Inbox not needed for consumer-only service
     }
 }

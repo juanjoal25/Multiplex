@@ -45,11 +45,8 @@ public sealed class RegistrarTransaccionHandler(
                 e.IdTransaccion.Value, e.IdOrden, e.ValorTotal.Amount, e.ValorTotal.Currency, e.OccurredOn), ct);
         transaccion.ClearEvents();
 
-        // Procesar pago en pasarela externa
+        // Procesar pago en pasarela externa (entity stays in Added state; EF captures final values on INSERT)
         await proceso.ProcesarPago(transaccion, (o, m, c) => pasarela.ProcesarPagoAsync(o, m, c), ct);
-
-        await repo.UpdateAsync(transaccion, ct);
-        await uow.SaveChangesAsync(ct);
 
         foreach (var e in transaccion.DomainEvents)
         {
@@ -65,6 +62,8 @@ public sealed class RegistrarTransaccionHandler(
                     break;
             }
         }
+
+        await uow.SaveChangesAsync(ct);
         transaccion.ClearEvents();
         return transaccion.Id.Value;
     }

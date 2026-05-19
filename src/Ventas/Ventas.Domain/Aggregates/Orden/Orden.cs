@@ -19,6 +19,8 @@ public sealed class Orden : AggregateRoot<OrdenId>
     public IReadOnlyCollection<ItemBoleta> Boletas => _boletas.AsReadOnly();
     public IReadOnlyCollection<ItemConfiteria> Confiterias => _confiterias.AsReadOnly();
 
+    private Orden() { EspectadorRef = null!; Descuento = null!; Expiracion = null!; Total = null!; }
+
     private Orden(OrdenId id, EspectadorRef esp, Descuento d, Expiracion exp, EstadoOrden est, Money total) : base(id)
     {
         EspectadorRef = esp; Descuento = d; Expiracion = exp; Estado = est; Total = total;

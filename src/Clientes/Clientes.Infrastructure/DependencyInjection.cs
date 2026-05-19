@@ -33,7 +33,6 @@ public static class DependencyInjection
             x.AddEntityFrameworkOutbox<ClientesDbContext>(o =>
             {
                 o.UsePostgres();
-                o.UseBusOutbox();
             });
             x.UsingRabbitMq((ctx, cfg) =>
             {

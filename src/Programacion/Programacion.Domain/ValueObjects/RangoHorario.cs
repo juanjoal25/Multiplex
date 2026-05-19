@@ -8,6 +8,7 @@ public sealed class RangoHorario : ValueObject
     public DateTime Inicio { get; }
     public DateTime Fin { get; }
 
+    private RangoHorario() { }
     private RangoHorario(DateTime inicio, DateTime fin) { Inicio = inicio; Fin = fin; }
 
     public static RangoHorario Of(DateTime inicio, DateTime fin)
@@ -38,6 +39,7 @@ public sealed class PeriodoCartelera : ValueObject
     public DateTime Inicio { get; }
     public DateTime Fin { get; }
 
+    private PeriodoCartelera() { }
     private PeriodoCartelera(DateTime inicio, DateTime fin) { Inicio = inicio; Fin = fin; }
 
     public static PeriodoCartelera Of(DateTime inicio, DateTime fin)

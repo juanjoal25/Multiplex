@@ -44,7 +44,8 @@ public sealed class AlquilerId : ValueObject
 public sealed class PeliculaRef : ValueObject
 {
     public Guid IdPelicula { get; }
-    private PeliculaRef(Guid v) => IdPelicula = v;
+    private PeliculaRef() { }
+    private PeliculaRef(Guid idPelicula) => IdPelicula = idPelicula;
     public static PeliculaRef Of(Guid v) { if (v == Guid.Empty) throw new InvariantViolationException("PeliculaRef vacío"); return new(v); }
     public static PeliculaRef Of(PeliculaId id) => new(id.Value);
     protected override IEnumerable<object?> GetEqualityComponents() { yield return IdPelicula; }
@@ -54,7 +55,8 @@ public sealed class SalaRef : ValueObject
 {
     public Guid IdSala { get; }
     public TipoSala? Tipo { get; }
-    private SalaRef(Guid v, TipoSala? tipo) { IdSala = v; Tipo = tipo; }
+    private SalaRef() { }
+    private SalaRef(Guid idSala, TipoSala? tipo) { IdSala = idSala; Tipo = tipo; }
     public static SalaRef Of(Guid v, TipoSala? tipo = null) { if (v == Guid.Empty) throw new InvariantViolationException("SalaRef vacío"); return new(v, tipo); }
     protected override IEnumerable<object?> GetEqualityComponents() { yield return IdSala; yield return Tipo; }
 }

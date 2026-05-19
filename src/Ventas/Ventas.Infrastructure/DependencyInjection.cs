@@ -37,7 +37,7 @@ public static class DependencyInjection
             x.AddConsumer<PagoAprobadoConsumer>();
             x.AddConsumer<PagoRechazadoConsumer>();
             x.AddConsumer<FuncionCanceladaConsumer>();
-            x.AddEntityFrameworkOutbox<VentasDbContext>(o => { o.UsePostgres(); o.UseBusOutbox(); });
+            x.AddEntityFrameworkOutbox<VentasDbContext>(o => { o.UsePostgres(); });
             x.UsingRabbitMq((ctx, cfg) =>
             {
                 cfg.Host(config["RabbitMq:Host"] ?? "localhost", "/", h =>

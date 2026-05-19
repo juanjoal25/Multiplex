@@ -8,7 +8,8 @@ public enum Clasificacion { G, PG, PG13, R }
 public sealed class Duracion : ValueObject
 {
     public int Minutos { get; }
-    private Duracion(int m) => Minutos = m;
+    private Duracion() { }
+    private Duracion(int minutos) => Minutos = minutos;
     public static Duracion Of(int minutos)
     {
         if (minutos <= 0 || minutos > 300)
@@ -21,8 +22,9 @@ public sealed class Duracion : ValueObject
 
 public sealed class Titulo : ValueObject
 {
-    public string Valor { get; }
-    private Titulo(string v) => Valor = v;
+    public string Valor { get; } = null!;
+    private Titulo() { }
+    private Titulo(string valor) => Valor = valor;
     public static Titulo Of(string v)
     {
         if (string.IsNullOrWhiteSpace(v) || v.Trim().Length < 2)
@@ -35,8 +37,9 @@ public sealed class Titulo : ValueObject
 
 public sealed class Genero : ValueObject
 {
-    public string Valor { get; }
-    private Genero(string v) => Valor = v;
+    public string Valor { get; } = null!;
+    private Genero() { }
+    private Genero(string valor) => Valor = valor;
     public static Genero Of(string v)
     {
         if (string.IsNullOrWhiteSpace(v))

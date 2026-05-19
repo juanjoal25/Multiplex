@@ -24,6 +24,7 @@ public sealed class ContratoId : ValueObject
 public sealed class NombreSucursal : ValueObject
 {
     public string Valor { get; }
+    private NombreSucursal() { Valor = null!; }
     private NombreSucursal(string v) => Valor = v;
     public static NombreSucursal Of(string v)
     {
@@ -39,6 +40,7 @@ public sealed class Vigencia : ValueObject
 {
     public DateTime FechaInicio { get; }
     public DateTime FechaFin { get; }
+    private Vigencia() { }
     private Vigencia(DateTime i, DateTime f) { FechaInicio = i; FechaFin = f; }
     public static Vigencia Of(DateTime i, DateTime f)
     {
@@ -59,6 +61,7 @@ public sealed class ParametroGlobal : ValueObject
     public string Valor { get; }
     public TipoParametro Tipo { get; }
 
+    private ParametroGlobal() { Clave = null!; Valor = null!; }
     private ParametroGlobal(string c, string v, TipoParametro t) { Clave = c; Valor = v; Tipo = t; }
 
     public static ParametroGlobal Of(string clave, string valor, TipoParametro tipo)

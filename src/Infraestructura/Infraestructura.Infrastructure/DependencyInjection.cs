@@ -30,7 +30,7 @@ public static class DependencyInjection
             x.AddConsumer<OrdenExpiradaConsumer>();
             x.AddConsumer<OrdenCanceladaConsumer>();
             x.AddConsumer<FuncionCanceladaConsumer>();
-            x.AddEntityFrameworkOutbox<InfraestructuraDbContext>(o => { o.UsePostgres(); o.UseBusOutbox(); });
+            x.AddEntityFrameworkOutbox<InfraestructuraDbContext>(o => { o.UsePostgres(); });
             x.UsingRabbitMq((ctx, cfg) =>
             {
                 cfg.Host(config["RabbitMq:Host"] ?? "localhost", "/", h =>

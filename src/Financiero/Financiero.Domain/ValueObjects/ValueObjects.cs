@@ -19,6 +19,7 @@ public enum MetodoPago { TarjetaCredito, TarjetaDebito, EfectivoTaquilla, Billet
 public sealed class ReferenciaExterna : ValueObject
 {
     public string Valor { get; }
+    private ReferenciaExterna() { Valor = null!; }
     private ReferenciaExterna(string v) => Valor = v;
     public static ReferenciaExterna Of(string v)
     {
@@ -52,6 +53,7 @@ public sealed class OrdenDepurada : ValueObject
     public IReadOnlyCollection<decimal> DescuentosAplicados { get; }
     public Money ValorTotal { get; }
 
+    private OrdenDepurada() { Conceptos = Array.Empty<ConceptoFacturable>(); DescuentosAplicados = Array.Empty<decimal>(); ValorTotal = null!; }
     private OrdenDepurada(Guid id, IReadOnlyCollection<ConceptoFacturable> c, IReadOnlyCollection<decimal> d, Money total)
     { IdOrden = id; Conceptos = c; DescuentosAplicados = d; ValorTotal = total; }
 

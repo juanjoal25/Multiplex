@@ -14,6 +14,8 @@ public sealed class Espectador : AggregateRoot<EspectadorId>
     public Documento Documento { get; private set; }
     public Suscripcion Suscripcion { get; private set; }
 
+    private Espectador() { Nombre = null!; Correo = null!; Documento = null!; Suscripcion = null!; }
+
     private Espectador(EspectadorId id, NombreCompleto nombre, Email correo, Documento documento, Suscripcion suscripcion)
         : base(id)
     {

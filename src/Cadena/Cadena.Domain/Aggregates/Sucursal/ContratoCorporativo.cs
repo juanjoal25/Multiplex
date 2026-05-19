@@ -11,6 +11,8 @@ public sealed class ContratoCorporativo : Entity<ContratoId>
     public string Condiciones { get; private set; }
     public EstadoContrato Estado { get; private set; }
 
+    private ContratoCorporativo() { Tercero = null!; Vigencia = null!; Condiciones = null!; }
+
     private ContratoCorporativo(ContratoId id, string tercero, Vigencia v, string condiciones, EstadoContrato e) : base(id)
     {
         Tercero = tercero; Vigencia = v; Condiciones = condiciones; Estado = e;

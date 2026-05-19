@@ -13,6 +13,8 @@ public sealed class Sucursal : AggregateRoot<SucursalId>
     public ConfiguracionGlobal Configuracion { get; private set; }
     public IReadOnlyCollection<ContratoCorporativo> Contratos => _contratos.AsReadOnly();
 
+    private Sucursal() { Nombre = null!; Configuracion = null!; }
+
     private Sucursal(SucursalId id, NombreSucursal nombre, ConfiguracionGlobal config, IEnumerable<ContratoCorporativo>? contratos = null) : base(id)
     {
         Nombre = nombre; Configuracion = config;

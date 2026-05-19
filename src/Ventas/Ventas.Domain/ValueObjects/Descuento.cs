@@ -10,6 +10,7 @@ public sealed class Descuento : ValueObject
     public decimal Porcentaje { get; }
     public NivelOrigen NivelOrigen { get; }
 
+    private Descuento() { }
     private Descuento(decimal porc, NivelOrigen nivel) { Porcentaje = porc; NivelOrigen = nivel; }
 
     public static Descuento Of(decimal porcentaje, NivelOrigen nivel)
@@ -27,6 +28,7 @@ public sealed class Descuento : ValueObject
 public sealed class Expiracion : ValueObject
 {
     public DateTime Valor { get; }
+    private Expiracion() { }
     private Expiracion(DateTime v) => Valor = v;
     public static Expiracion Of(DateTime v, DateTime ahora)
     {

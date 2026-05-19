@@ -34,6 +34,7 @@ public sealed class DefComboId : ValueObject
 public sealed class EspectadorRef : ValueObject
 {
     public Guid Value { get; }
+    private EspectadorRef() { }
     private EspectadorRef(Guid v) => Value = v;
     public static EspectadorRef Of(Guid v) { if (v == Guid.Empty) throw new InvariantViolationException("EspectadorRef vacío"); return new(v); }
     protected override IEnumerable<object?> GetEqualityComponents() { yield return Value; }
@@ -42,6 +43,7 @@ public sealed class EspectadorRef : ValueObject
 public sealed class FuncionRef : ValueObject
 {
     public Guid Value { get; }
+    private FuncionRef() { }
     private FuncionRef(Guid v) => Value = v;
     public static FuncionRef Of(Guid v) { if (v == Guid.Empty) throw new InvariantViolationException("FuncionRef vacío"); return new(v); }
     protected override IEnumerable<object?> GetEqualityComponents() { yield return Value; }
@@ -50,6 +52,7 @@ public sealed class FuncionRef : ValueObject
 public sealed class SillaRef : ValueObject
 {
     public Guid Value { get; }
+    private SillaRef() { }
     private SillaRef(Guid v) => Value = v;
     public static SillaRef Of(Guid v) { if (v == Guid.Empty) throw new InvariantViolationException("SillaRef vacío"); return new(v); }
     protected override IEnumerable<object?> GetEqualityComponents() { yield return Value; }

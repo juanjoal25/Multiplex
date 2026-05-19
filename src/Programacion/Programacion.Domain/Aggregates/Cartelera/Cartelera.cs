@@ -18,6 +18,7 @@ public sealed class Cartelera : AggregateRoot<CarteleraId>
     public PeriodoCartelera Periodo { get; private set; }
     public IReadOnlyCollection<Guid> Funciones => _funciones;
 
+    private Cartelera() { Periodo = null!; }
     private Cartelera(CarteleraId id, PeriodoCartelera periodo, IEnumerable<Guid>? funciones = null) : base(id)
     {
         Periodo = periodo;

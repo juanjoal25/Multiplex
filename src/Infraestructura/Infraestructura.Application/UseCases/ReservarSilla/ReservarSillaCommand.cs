@@ -35,12 +35,12 @@ public sealed class ReservarSillaHandler(ISalaRepository repo, IEventPublisher p
         }
 
         await repo.UpdateAsync(sala, ct);
-        await uow.SaveChangesAsync(ct);
 
         foreach (var e in sala.DomainEvents.OfType<DomainEvents.SillaReservada>())
             await publisher.PublishAsync(new Messaging.Contracts.Infraestructura.SillaReservada(
                 e.IdSilla.Value, e.IdFuncion, e.IdOrden, e.Expiracion, e.OccurredOn), ct);
 
+        await uow.SaveChangesAsync(ct);
         sala.ClearEvents();
         return Unit.Value;
     }

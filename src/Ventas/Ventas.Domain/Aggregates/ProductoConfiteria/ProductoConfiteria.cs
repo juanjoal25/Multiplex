@@ -12,6 +12,7 @@ public sealed class ProductoConfiteria : AggregateRoot<ProductoId>
     public Money Precio { get; private set; }
     public int Stock { get; private set; }
 
+    private ProductoConfiteria() { Nombre = null!; Precio = null!; }
     private ProductoConfiteria(ProductoId id, string nombre, Money precio, int stock) : base(id)
     {
         Nombre = nombre; Precio = precio; Stock = stock;

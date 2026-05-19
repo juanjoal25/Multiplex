@@ -10,6 +10,7 @@ public sealed class Documento : ValueObject
     public TipoDocumento Tipo { get; }
     public string Numero { get; }
 
+    private Documento() { Numero = null!; }
     private Documento(TipoDocumento tipo, string numero) { Tipo = tipo; Numero = numero; }
 
     public static Documento Of(TipoDocumento tipo, string numero)

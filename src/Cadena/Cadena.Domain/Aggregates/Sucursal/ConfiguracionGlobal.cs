@@ -12,6 +12,8 @@ public sealed class ConfiguracionGlobal : Entity<Guid>
     public string Moneda { get; private set; }
     public IReadOnlyCollection<ParametroGlobal> Parametros => _parametros.Values;
 
+    private ConfiguracionGlobal() { ZonaHoraria = null!; Moneda = null!; }
+
     private ConfiguracionGlobal(Guid id, string zh, string moneda, IEnumerable<ParametroGlobal>? p = null) : base(id)
     {
         ZonaHoraria = zh; Moneda = moneda;

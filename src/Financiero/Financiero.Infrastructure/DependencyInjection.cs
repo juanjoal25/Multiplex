@@ -25,7 +25,6 @@ public static class DependencyInjection
         {
             x.SetKebabCaseEndpointNameFormatter();
             x.AddConsumer<OrdenConfirmadaConsumer>();
-            x.AddEntityFrameworkOutbox<FinancieroDbContext>(o => { o.UsePostgres(); o.UseBusOutbox(); });
             x.UsingRabbitMq((ctx, cfg) =>
             {
                 cfg.Host(config["RabbitMq:Host"] ?? "localhost", "/", h =>

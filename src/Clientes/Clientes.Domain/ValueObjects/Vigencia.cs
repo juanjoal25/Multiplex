@@ -8,6 +8,7 @@ public sealed class Vigencia : ValueObject
     public DateTime FechaInicio { get; }
     public DateTime FechaFin { get; }
 
+    private Vigencia() { }
     private Vigencia(DateTime inicio, DateTime fin) { FechaInicio = inicio; FechaFin = fin; }
 
     public static Vigencia Of(DateTime inicio, DateTime fin)

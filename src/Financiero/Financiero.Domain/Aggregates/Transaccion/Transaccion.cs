@@ -35,6 +35,8 @@ public sealed class Transaccion : AggregateRoot<TransaccionId>
     public DateTime Timestamp { get; }
     public TransaccionReversion? Reversion { get; private set; }
 
+    private Transaccion() { Orden = null!; }
+
     private Transaccion(TransaccionId id, OrdenDepurada orden, MetodoPago metodo, EstadoPago estado,
         ReferenciaExterna? ref_, RegistroContable? reg, DateTime ts, TransaccionReversion? rev) : base(id)
     {

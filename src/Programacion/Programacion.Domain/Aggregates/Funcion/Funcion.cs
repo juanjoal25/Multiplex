@@ -9,14 +9,19 @@ namespace Programacion.Domain.Aggregates.FuncionAgg;
 
 public sealed class Funcion : AggregateRoot<FuncionId>
 {
+    private TipoFormato _formatoTipo;
+    private EstadoFuncionTipo _estadoTipo;
+
     public PeliculaRef PeliculaRef { get; private set; }
     public SalaRef SalaRef { get; private set; }
     public RangoHorario Horario { get; private set; }
-    public IFormatoProyeccion Formato { get; private set; }
-    public IEstadoFuncion Estado { get; private set; }
+    public IFormatoProyeccion Formato => FormatoFactory.FromTipo(_formatoTipo);
+    public IEstadoFuncion Estado => EstadoFuncionFactory.FromTipo(_estadoTipo);
+
+    private Funcion() { PeliculaRef = null!; SalaRef = null!; Horario = null!; }
 
     private Funcion(FuncionId id, PeliculaRef p, SalaRef s, RangoHorario h, IFormatoProyeccion f, IEstadoFuncion e)
-        : base(id) { PeliculaRef = p; SalaRef = s; Horario = h; Formato = f; Estado = e; }
+        : base(id) { PeliculaRef = p; SalaRef = s; Horario = h; _formatoTipo = f.Tipo; _estadoTipo = e.Tipo; }
 
     public static Funcion Programar(PeliculaRef pelicula, SalaRef sala, RangoHorario horario, IFormatoProyeccion formato)
     {
@@ -43,7 +48,7 @@ public sealed class Funcion : AggregateRoot<FuncionId>
     {
         if (ahora < Horario.Inicio)
             throw new PreconditionFailedException("No se puede iniciar antes de Horario.Inicio");
-        Estado = Estado.Iniciar();
+        _estadoTipo = Estado.Iniciar().Tipo;
         Raise(new Events.FuncionIniciadaEvento(Id, SalaRef));
     }
 
@@ -51,7 +56,7 @@ public sealed class Funcion : AggregateRoot<FuncionId>
     {
         if (ahora < Horario.Fin)
             throw new PreconditionFailedException("No se puede finalizar antes de Horario.Fin");
-        Estado = Estado.Finalizar();
+        _estadoTipo = Estado.Finalizar().Tipo;
         Raise(new Events.FuncionFinalizadaEvento(Id, SalaRef));
     }
 
@@ -59,7 +64,7 @@ public sealed class Funcion : AggregateRoot<FuncionId>
     {
         if (string.IsNullOrWhiteSpace(motivo))
             throw new PreconditionFailedException("Motivo requerido");
-        Estado = Estado.Cancelar();
+        _estadoTipo = Estado.Cancelar().Tipo;
         Raise(new Events.FuncionCanceladaEvento(Id, SalaRef, motivo));
     }
 }

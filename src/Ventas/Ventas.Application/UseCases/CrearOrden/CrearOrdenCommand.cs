@@ -94,13 +94,13 @@ public sealed class CrearOrdenHandler(
         var orden = Orden.Crear(EspectadorRef.Of(cmd.IdEspectador), boletas, confiterias, descuento, expiracion);
 
         await ordenRepo.AddAsync(orden, ct);
-        await uow.SaveChangesAsync(ct);
 
         foreach (var e in orden.DomainEvents.OfType<DomainEvents.OrdenCreada>())
             await publisher.PublishAsync(new Messaging.Contracts.Ventas.OrdenCreada(
                 e.IdOrden.Value, e.Espectador.Value, e.Sillas,
                 cmd.Boletas.Select(b => b.IdFuncion).ToList(), e.Total.Amount, e.Expiracion), ct);
 
+        await uow.SaveChangesAsync(ct);
         orden.ClearEvents();
         return new CrearOrdenResult(orden.Id.Value, orden.Total.Amount, orden.Expiracion.Valor);
     }

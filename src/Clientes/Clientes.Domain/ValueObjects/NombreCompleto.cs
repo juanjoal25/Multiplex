@@ -8,6 +8,7 @@ public sealed class NombreCompleto : ValueObject
     public string Nombre { get; }
     public string Apellido { get; }
 
+    private NombreCompleto() { Nombre = null!; Apellido = null!; }
     private NombreCompleto(string nombre, string apellido) { Nombre = nombre; Apellido = apellido; }
 
     public static NombreCompleto Of(string nombre, string apellido)

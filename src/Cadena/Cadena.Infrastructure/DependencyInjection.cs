@@ -25,7 +25,7 @@ public static class DependencyInjection
         services.AddMassTransit(x =>
         {
             x.SetKebabCaseEndpointNameFormatter();
-            x.AddEntityFrameworkOutbox<CadenaDbContext>(o => { o.UsePostgres(); o.UseBusOutbox(); });
+            x.AddEntityFrameworkOutbox<CadenaDbContext>(o => { o.UsePostgres(); });
             x.UsingRabbitMq((ctx, cfg) =>
             {
                 cfg.Host(config["RabbitMq:Host"] ?? "localhost", "/", h =>

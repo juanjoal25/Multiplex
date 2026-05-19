@@ -14,6 +14,7 @@ public sealed class ItemBoleta : Entity<Guid>
     public Money PrecioBase { get; private set; }
     public TipoBoleta Tipo { get; private set; }
 
+    private ItemBoleta() { FuncionRef = null!; SillaRef = null!; PrecioBase = null!; }
     private ItemBoleta(Guid id, FuncionRef fref, SillaRef sref, Money precio, TipoBoleta tipo) : base(id)
     {
         FuncionRef = fref; SillaRef = sref; PrecioBase = precio; Tipo = tipo;

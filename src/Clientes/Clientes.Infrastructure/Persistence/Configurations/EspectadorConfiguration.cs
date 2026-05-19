@@ -44,9 +44,11 @@ public sealed class EspectadorConfiguration : IEntityTypeConfiguration<Espectado
             s.HasKey("Id");
             s.WithOwner().HasForeignKey("EspectadorId");
 
-            s.Property<EstadoSuscripcionTipo>("EstadoTipo")
+            s.Property<EstadoSuscripcionTipo>("_estadoTipo")
+                .HasField("_estadoTipo")
                 .HasColumnName("estado").HasConversion<string>().HasMaxLength(20).IsRequired();
-            s.Property<TipoNivel>("NivelTipo")
+            s.Property<TipoNivel>("_nivelTipo")
+                .HasField("_nivelTipo")
                 .HasColumnName("nivel").HasConversion<string>().HasMaxLength(20).IsRequired();
 
             s.Ignore(x => x.Estado);

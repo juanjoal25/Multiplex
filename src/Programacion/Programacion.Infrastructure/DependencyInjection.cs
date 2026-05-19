@@ -32,7 +32,7 @@ public static class DependencyInjection
             x.SetKebabCaseEndpointNameFormatter();
             x.AddConsumer<SalaEnMantenimientoConsumer>();
             x.AddConsumer<SalaReactivadaConsumer>();
-            x.AddEntityFrameworkOutbox<ProgramacionDbContext>(o => { o.UsePostgres(); o.UseBusOutbox(); });
+            x.AddEntityFrameworkOutbox<ProgramacionDbContext>(o => { o.UsePostgres(); });
             x.UsingRabbitMq((ctx, cfg) =>
             {
                 cfg.Host(config["RabbitMq:Host"] ?? "localhost", "/", h =>

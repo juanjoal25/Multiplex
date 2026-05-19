@@ -45,9 +45,9 @@ public sealed class FuncionConfig : IEntityTypeConfiguration<Funcion>
             h.Property(p => p.Fin).HasColumnName("fin");
         });
         b.Ignore(x => x.Formato);
-        b.Property<TipoFormato>("FormatoTipo").HasColumnName("formato").HasConversion<string>().HasMaxLength(20).IsRequired();
+        b.Property<TipoFormato>("_formatoTipo").HasField("_formatoTipo").HasColumnName("formato").HasConversion<string>().HasMaxLength(20).IsRequired();
         b.Ignore(x => x.Estado);
-        b.Property<EstadoFuncionTipo>("EstadoTipo").HasColumnName("estado").HasConversion<string>().HasMaxLength(20).IsRequired();
+        b.Property<EstadoFuncionTipo>("_estadoTipo").HasField("_estadoTipo").HasColumnName("estado").HasConversion<string>().HasMaxLength(20).IsRequired();
         b.Ignore(x => x.DomainEvents);
     }
 }

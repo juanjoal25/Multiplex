@@ -33,9 +33,8 @@ public sealed class ConfirmarOrdenHandler(
         }
 
         await ordenRepo.UpdateAsync(orden, ct);
-        await uow.SaveChangesAsync(ct);
 
-        // Construir OrdenDepurada e integration event
+        // Construir OrdenDepurada e integration event (before SaveChanges for outbox atomicity)
         foreach (var e in orden.DomainEvents.OfType<DomainEvents.OrdenConfirmada>())
         {
             var conceptos = new List<Messaging.Contracts.Ventas.ConceptoFacturableDto>();
@@ -52,6 +51,7 @@ public sealed class ConfirmarOrdenHandler(
                 e.IdOrden.Value, conceptos, descuentos, e.ValorTotal.Amount, e.ValorTotal.Currency), ct);
         }
 
+        await uow.SaveChangesAsync(ct);
         orden.ClearEvents();
         return Unit.Value;
     }

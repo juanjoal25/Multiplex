@@ -9,16 +9,19 @@ namespace Infraestructura.Domain.Aggregates.SalaAgg;
 public sealed class Sala : AggregateRoot<SalaId>
 {
     private readonly List<Silla> _sillas = new();
+    private EstadoSalaTipo _estadoTipo;
 
     public string Nombre { get; private set; }
     public TipoSala Tipo { get; private set; }
     public Aforo Aforo { get; private set; }
-    public IEstadoSala Estado { get; private set; }
+    public IEstadoSala Estado => EstadoSalaFactory.FromTipo(_estadoTipo);
     public IReadOnlyCollection<Silla> Sillas => _sillas.AsReadOnly();
+
+    private Sala() { Nombre = null!; Aforo = null!; }
 
     private Sala(SalaId id, string nombre, TipoSala tipo, Aforo aforo, IEstadoSala estado, IEnumerable<Silla>? sillas = null) : base(id)
     {
-        Nombre = nombre; Tipo = tipo; Aforo = aforo; Estado = estado;
+        Nombre = nombre; Tipo = tipo; Aforo = aforo; _estadoTipo = estado.Tipo;
         if (sillas is not null) _sillas.AddRange(sillas);
     }
 
@@ -45,7 +48,7 @@ public sealed class Sala : AggregateRoot<SalaId>
     public void ReservarSilla(SillaId sillaId, Guid idFuncion, Guid idOrden, ReservaExpiracion expiracion)
     {
         if (!Estado.PermiteReservaSillas)
-            throw new PreconditionFailedException($"Sala en estado {Estado.Tipo} no permite reservas");
+            throw new PreconditionFailedException($"Sala en estado {_estadoTipo} no permite reservas");
         var silla = _sillas.FirstOrDefault(s => s.Id == sillaId)
             ?? throw new PreconditionFailedException("Silla no existe en esta sala");
 
@@ -63,7 +66,7 @@ public sealed class Sala : AggregateRoot<SalaId>
 
     public void OcuparSilla(SillaId sillaId, Guid idFuncion)
     {
-        if (Estado.Tipo != EstadoSalaTipo.Ocupada)
+        if (_estadoTipo != EstadoSalaTipo.Ocupada)
             throw new PreconditionFailedException("Sala debe estar OCUPADA (función en curso) para ocupar sillas");
         var silla = _sillas.FirstOrDefault(s => s.Id == sillaId)
             ?? throw new PreconditionFailedException("Silla no existe");
@@ -84,20 +87,20 @@ public sealed class Sala : AggregateRoot<SalaId>
     {
         if (_sillas.Any(s => s.Estado.Tipo is EstadoSillaTipo.Reservada or EstadoSillaTipo.Ocupada))
             throw new PreconditionFailedException("Sala con sillas RESERVADA u OCUPADA no puede ir a mantenimiento");
-        Estado = Estado.EnviarMantenimiento();
+        _estadoTipo = Estado.EnviarMantenimiento().Tipo;
         Raise(new SalaEnMantenimiento(Id));
     }
 
     public void Reactivar()
     {
-        Estado = Estado.Reactivar();
+        _estadoTipo = Estado.Reactivar().Tipo;
         Raise(new SalaReactivada(Id));
     }
 
-    public void IniciarFuncion() { Estado = Estado.IniciarFuncion(); }
+    public void IniciarFuncion() { _estadoTipo = Estado.IniciarFuncion().Tipo; }
     public void FinalizarFuncion()
     {
-        Estado = Estado.FinalizarFuncion();
+        _estadoTipo = Estado.FinalizarFuncion().Tipo;
         foreach (var s in _sillas.Where(x => x.Estado.Tipo is EstadoSillaTipo.Reservada or EstadoSillaTipo.Ocupada))
             s.Liberar();
     }

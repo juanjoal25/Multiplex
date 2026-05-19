@@ -29,6 +29,7 @@ public sealed class DefCombo : AggregateRoot<DefComboId>
     public bool Activo { get; private set; }
     public IReadOnlyCollection<ComboItem> Items => _items.AsReadOnly();
 
+    private DefCombo() { Nombre = null!; PrecioEspecial = null!; }
     private DefCombo(DefComboId id, string nombre, Money precio, bool activo) : base(id)
     { Nombre = nombre; PrecioEspecial = precio; Activo = activo; }
 

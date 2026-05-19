@@ -13,6 +13,7 @@ public sealed class Pelicula : AggregateRoot<PeliculaId>
     public Duracion Duracion { get; private set; }
     public TipoFormato FormatoDisponible { get; private set; }
 
+    private Pelicula() { Titulo = null!; Genero = null!; Duracion = null!; }
     private Pelicula(PeliculaId id, Titulo titulo, Clasificacion clas, Genero genero, Duracion duracion, TipoFormato formato)
         : base(id)
     {
