@@ -56,7 +56,14 @@ public static class DataSeeder
 
     public static async Task SeedAsync(ProgramacionDbContext db)
     {
-        if (await db.Peliculas.AnyAsync()) return;
+        if (await db.Carteleras.AnyAsync()) return;
+
+        if (await db.Peliculas.AnyAsync())
+        {
+            db.Peliculas.RemoveRange(db.Peliculas);
+            db.Funciones.RemoveRange(db.Funciones);
+            await db.SaveChangesAsync();
+        }
 
         var ahora = DateTime.UtcNow;
         var manana = ahora.Date.AddDays(1);
@@ -125,7 +132,8 @@ public static class DataSeeder
                     var horario = HorariosPrincipioPelicula[func % HorariosPrincipioPelicula.Length];
                     var inicio = diaActual.AddHours(horario);
 
-                    var pelicula = await db.Peliculas.FirstAsync(p => p.Id.Value == peliculasIds[peliculaIdx]);
+                    var pelId = PeliculaId.Of(peliculasIds[peliculaIdx]);
+                    var pelicula = await db.Peliculas.FirstAsync(p => p.Id == pelId);
                     var duracionMin = pelicula.Duracion.Minutos;
 
                     var fin = inicio.AddMinutes(duracionMin + 10); // +10 min limpieza
@@ -159,9 +167,9 @@ public static class DataSeeder
             await db.SaveChangesAsync();
         }
 
-        // ─── Crear cartelera de 2 semanas ───
-        var carteleraInicio = manana;
-        var carteleraFin = carteleraInicio.AddDays(14);
+        // ─── Crear cartelera vigente (desde hoy, 2 semanas) ───
+        var carteleraInicio = ahora.Date;
+        var carteleraFin = carteleraInicio.AddDays(15);
 
         var cartelera = Cartelera.Restore(
             CarteleraId.New(),
@@ -178,7 +186,7 @@ public static class DataSeeder
         0 => new("33333333-0000-0000-0000-000000000001"),
         1 => new("33333333-0000-0000-0000-000000000002"),
         2 => new("33333333-0000-0000-0000-000000000003"),
-        _ => new Guid($"33333333-0000-0000-0000-00000000000{(index + 1):D2}")
+        _ => new Guid($"33333333-0000-0000-0000-{(index + 1):D12}")
     };
 
     private static TipoSala GetTipoSala(int index) => index switch

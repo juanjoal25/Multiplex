@@ -17,7 +17,9 @@ public sealed class RegistrarContratoHandler(ISucursalRepository repo, IEventPub
     {
         var s = await repo.GetByIdAsync(SucursalId.Of(cmd.IdSucursal), ct)
             ?? throw new PreconditionFailedException("Sucursal no existe");
-        var contrato = s.RegistrarContrato(cmd.Tercero, Vigencia.Of(cmd.VigenciaInicio, cmd.VigenciaFin), cmd.Condiciones);
+        var inicio = DateTime.SpecifyKind(cmd.VigenciaInicio, DateTimeKind.Utc);
+        var fin = DateTime.SpecifyKind(cmd.VigenciaFin, DateTimeKind.Utc);
+        var contrato = s.RegistrarContrato(cmd.Tercero, Vigencia.Of(inicio, fin), cmd.Condiciones);
         await repo.UpdateAsync(s, ct);
         await uow.SaveChangesAsync(ct);
 

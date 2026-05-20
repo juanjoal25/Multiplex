@@ -15,6 +15,7 @@ public sealed record ProgramarFuncionCommand(Guid IdPelicula, Guid IdSala, DateT
 public sealed class ProgramarFuncionHandler(
     IFuncionRepository funcRepo,
     IPeliculaRepository pelRepo,
+    ICarteleraRepository carteleraRepo,
     IInfraestructuraClient infra,
     SvcValidacionHorario validacion,
     IEventPublisher publisher,
@@ -24,6 +25,10 @@ public sealed class ProgramarFuncionHandler(
     {
         var pel = await pelRepo.GetByIdAsync(PeliculaId.Of(cmd.IdPelicula), ct)
             ?? throw new PreconditionFailedException("Pelicula no existe");
+
+        var cartelera = await carteleraRepo.GetVigenteAsync(DateTime.UtcNow, ct)
+            ?? throw new PreconditionFailedException("No hay cartelera vigente: no se pueden programar funciones");
+
         if (!await infra.SalaExisteYDisponibleAsync(cmd.IdSala, ct))
             throw new PreconditionFailedException("Sala no disponible");
 
@@ -40,6 +45,9 @@ public sealed class ProgramarFuncionHandler(
         var func = Funcion.Programar(PeliculaRef.Of(pel.Id), sala, horario, formato);
         await funcRepo.AddAsync(func, ct);
 
+        cartelera.Agregar(func.Id);
+        await carteleraRepo.UpdateAsync(cartelera, ct);
+
         foreach (var e in func.DomainEvents.OfType<DomainEvents.FuncionProgramadaEvento>())
             await publisher.PublishAsync(new Messaging.Contracts.Programacion.FuncionProgramada(
                 e.IdFuncion.Value, e.PeliculaRef.IdPelicula, e.SalaRef.IdSala,
@@ -48,6 +56,7 @@ public sealed class ProgramarFuncionHandler(
 
         await uow.SaveChangesAsync(ct);
         func.ClearEvents();
+        cartelera.ClearEvents();
         return func.Id.Value;
     }
 }

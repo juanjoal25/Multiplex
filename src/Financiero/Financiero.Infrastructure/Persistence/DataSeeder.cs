@@ -80,12 +80,13 @@ public static class DataSeeder
 
         // ─── ~50 transacciones adicionales aleatorias ───
         var ordenes = Enumerable.Range(0, 150).Select(i =>
-            Guid.Parse($"77777777-0000-0000-0000-{i:D15}")).ToList();
+            Guid.Parse($"77777777-0000-0000-0000-{i:D12}")).ToList();
 
         for (int i = 0; i < 50; i++)
         {
             var ordenIdx = random.Next(ordenes.Count);
             var ordenId = ordenes[ordenIdx];
+            ordenes.RemoveAt(ordenIdx);
 
             // Si es una de las órdenes de prueba, usa valores conocidos
             if (ordenId == IdOrden1 || ordenId == IdOrden2 || ordenId == IdOrden3)

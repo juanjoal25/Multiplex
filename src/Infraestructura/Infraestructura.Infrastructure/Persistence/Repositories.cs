@@ -16,6 +16,9 @@ public sealed class SalaRepository(InfraestructuraDbContext db) : ISalaRepositor
     public Task UpdateAsync(Sala a, CancellationToken ct = default) { db.Salas.Update(a); return Task.CompletedTask; }
     public Task DeleteAsync(Sala a, CancellationToken ct = default) { db.Salas.Remove(a); return Task.CompletedTask; }
 
+    public async Task<IReadOnlyCollection<Sala>> GetAllAsync(CancellationToken ct = default)
+        => await db.Salas.Include(s => s.Sillas).ToListAsync(ct);
+
     public Task<Sala?> GetBySillaIdAsync(SillaId sillaId, CancellationToken ct = default)
         => db.Salas.Include(s => s.Sillas).FirstOrDefaultAsync(s => s.Sillas.Any(x => x.Id == sillaId), ct);
 

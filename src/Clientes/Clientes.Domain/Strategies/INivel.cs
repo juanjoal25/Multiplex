@@ -17,7 +17,7 @@ public interface INivel
 public sealed class NivelNormal : INivel
 {
     public TipoNivel Tipo => TipoNivel.Normal;
-    public PorcentajeDescuento CalcularDescuento() => PorcentajeDescuento.Of(0.05m);
+    public PorcentajeDescuento CalcularDescuento() => PorcentajeDescuento.Of(0m);
     public bool PuedeAscender() => true;
     public bool PuedeDescender() => false;
     public INivel Ascender() => new NivelOro();

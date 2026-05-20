@@ -46,17 +46,14 @@ public static class DataSeeder
         if (await db.Salas.AnyAsync()) return;
 
         var salas = new List<Sala>();
-        var fixedIds = new Dictionary<int, Guid>
-        {
-            [0] = IdSala1,
-            [1] = IdSala2,
-            [2] = IdSala3,
-        };
+        // Misma convención que Programacion.DataSeeder.GetSalaId: 33333333-0000-0000-0000-{(i+1):D12}
+        // Así los IDs de sala son consistentes entre ambos microservicios.
+        static Guid SalaIdFijo(int i) => new($"33333333-0000-0000-0000-{(i + 1):D12}");
 
         for (int i = 0; i < SalasConfig.Length; i++)
         {
             var config = SalasConfig[i];
-            var salaId = fixedIds.TryGetValue(i, out var fid) ? fid : SalaId.New().Value;
+            var salaId = SalaIdFijo(i);
 
             var sillas = BuildSillas(i, config.tipo, config.aforo);
 
@@ -77,7 +74,7 @@ public static class DataSeeder
 
     private static IEnumerable<Silla> BuildSillas(int salaIndex, TipoSala tipoSala, int aforo)
     {
-        var filas = (aforo / 10) switch
+        string[] filas = (aforo / 10) switch
         {
             <= 3 => ["A", "B", "C"],
             <= 8 => ["A", "B", "C", "D", "E", "F", "G", "H"],

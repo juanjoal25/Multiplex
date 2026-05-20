@@ -21,6 +21,10 @@ public sealed class TransaccionController(IMediator mediator, ITransaccionReposi
         string Moneda,
         MetodoPago MetodoPago);
 
+    [HttpGet("transacciones")]
+    public async Task<IActionResult> GetAll(CancellationToken ct)
+        => Ok(await mediator.Send(new ConsultarHistorialQuery(DateTime.UtcNow.AddYears(-10), DateTime.UtcNow.AddYears(1)), ct));
+
     [HttpPost("transacciones")]
     public async Task<ActionResult<Guid>> Registrar([FromBody] RegistrarRequest r, CancellationToken ct)
     {

@@ -13,6 +13,21 @@ namespace Infraestructura.Api.Controllers;
 [Route("v1/infraestructura/salas")]
 public sealed class SalaController(IMediator mediator, ISalaRepository repo) : ControllerBase
 {
+    [HttpGet]
+    public async Task<IActionResult> GetAll(CancellationToken ct)
+    {
+        var salas = await repo.GetAllAsync(ct);
+        return Ok(salas.Select(s => new
+        {
+            Id = s.Id.Value,
+            s.Nombre,
+            Tipo = s.Tipo.ToString(),
+            Estado = s.Estado.Tipo.ToString(),
+            Aforo = s.Aforo.Valor,
+            Disponibles = s.Sillas.Count(x => x.Estado.Tipo == Infraestructura.Domain.States.EstadoSillaTipo.Disponible)
+        }));
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id, CancellationToken ct)
     {

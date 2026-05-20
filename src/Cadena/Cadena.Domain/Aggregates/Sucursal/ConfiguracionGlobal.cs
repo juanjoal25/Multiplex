@@ -6,18 +6,24 @@ namespace Cadena.Domain.Aggregates.SucursalAgg;
 
 public sealed class ConfiguracionGlobal : Entity<Guid>
 {
-    private readonly Dictionary<string, ParametroGlobal> _parametros = new();
+    private readonly List<ParametroGlobal> _parametros = new();
 
     public string ZonaHoraria { get; private set; }
     public string Moneda { get; private set; }
-    public IReadOnlyCollection<ParametroGlobal> Parametros => _parametros.Values;
+    public IReadOnlyCollection<ParametroGlobal> Parametros => _parametros.AsReadOnly();
 
     private ConfiguracionGlobal() { ZonaHoraria = null!; Moneda = null!; }
 
     private ConfiguracionGlobal(Guid id, string zh, string moneda, IEnumerable<ParametroGlobal>? p = null) : base(id)
     {
         ZonaHoraria = zh; Moneda = moneda;
-        if (p is not null) foreach (var x in p) _parametros[x.Clave] = x;
+        if (p is not null) foreach (var x in p) Upsert(x);
+    }
+
+    private void Upsert(ParametroGlobal p)
+    {
+        var i = _parametros.FindIndex(x => x.Clave == p.Clave);
+        if (i >= 0) _parametros[i] = p; else _parametros.Add(p);
     }
 
     public static ConfiguracionGlobal Crear(string zonaHoraria, string moneda)
@@ -35,11 +41,11 @@ public sealed class ConfiguracionGlobal : Entity<Guid>
         var mods = new List<ParametroGlobal>();
         foreach (var p in nuevos)
         {
-            _parametros[p.Clave] = p;
+            Upsert(p);
             mods.Add(p);
         }
         return mods;
     }
 
-    public ParametroGlobal? Obtener(string clave) => _parametros.TryGetValue(clave, out var p) ? p : null;
+    public ParametroGlobal? Obtener(string clave) => _parametros.FirstOrDefault(x => x.Clave == clave);
 }

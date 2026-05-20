@@ -34,4 +34,26 @@ public sealed class ContratoController(IMediator mediator, ISucursalRepository r
                 && c.Vigencia.EstaVigenteEn(ahora));
         return vigente ? Ok() : NotFound();
     }
+
+    [HttpGet("activos")]
+    public async Task<IActionResult> Activos([FromQuery] Guid? idSucursal, CancellationToken ct)
+    {
+        var sucursales = await repo.GetTodasAsync(ct);
+        var ahora = DateTime.UtcNow;
+        var contratos = sucursales
+            .Where(s => idSucursal is null || s.Id.Value == idSucursal)
+            .SelectMany(s => s.Contratos.Select(c => new
+            {
+                Id = c.Id.Value,
+                IdSucursal = s.Id.Value,
+                Sucursal = s.Nombre.Valor,
+                c.Tercero,
+                Estado = c.Estado.ToString(),
+                VigenciaInicio = c.Vigencia.FechaInicio,
+                VigenciaFin = c.Vigencia.FechaFin,
+                c.Condiciones
+            }))
+            .Where(c => c.Estado == "Vigente");
+        return Ok(contratos);
+    }
 }

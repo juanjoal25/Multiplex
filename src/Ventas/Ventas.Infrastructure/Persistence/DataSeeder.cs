@@ -132,9 +132,9 @@ public static class DataSeeder
         }
 
         // ─── Crear ~50 órdenes adicionales aleatorias ───
-        var clientes = Enumerable.Range(0, 150).Select(i => Guid.Parse($"11111111-0000-0000-0000-{i:D15}")).ToList();
-        var funciones = Enumerable.Range(0, 80).Select(i => Guid.Parse($"44444444-0000-0000-0000-{i:D15}")).ToList();
-        var sillas = Enumerable.Range(0, 1000).Select(i => Guid.Parse($"99990000-0000-0000-0000-{i:D15}")).ToList();
+        var clientes = Enumerable.Range(0, 150).Select(i => Guid.Parse($"11111111-0000-0000-0000-{i:D12}")).ToList();
+        var funciones = Enumerable.Range(0, 80).Select(i => Guid.Parse($"44444444-0000-0000-0000-{i:D12}")).ToList();
+        var sillas = Enumerable.Range(0, 1000).Select(i => Guid.Parse($"99990000-0000-0000-0000-{i:D12}")).ToList();
 
         for (int i = 0; i < 50; i++)
         {

@@ -6,14 +6,32 @@ using Programacion.Application.UseCases.ProgramarFuncion;
 using Programacion.Domain.Repositories;
 using Programacion.Domain.Strategies;
 using Programacion.Domain.ValueObjects;
+using Programacion.Infrastructure.Persistence;
 
 namespace Programacion.Api.Controllers;
 
 [ApiController]
 [Route("v1/programacion")]
-public sealed class FuncionController(IMediator mediator, IFuncionRepository repo) : ControllerBase
+public sealed class FuncionController(IMediator mediator, IFuncionRepository repo, ProgramacionDbContext db) : ControllerBase
 {
     public sealed record CrearFuncionRequest(Guid IdPelicula, Guid IdSala, DateTime Inicio, DateTime Fin, TipoFormato Formato);
+
+    [HttpGet("funciones")]
+    public async Task<IActionResult> GetAll(CancellationToken ct)
+    {
+        var funciones = await db.Funciones.AsNoTracking().ToListAsync(ct);
+        var lista = funciones.Select(f => new
+        {
+            Id = f.Id.Value,
+            IdPelicula = f.PeliculaRef.IdPelicula,
+            IdSala = f.SalaRef.IdSala,
+            Inicio = f.Horario.Inicio,
+            Fin = f.Horario.Fin,
+            Formato = f.Formato.Tipo.ToString(),
+            Estado = f.Estado.Tipo.ToString()
+        });
+        return Ok(lista);
+    }
 
     [HttpPost("funciones")]
     public async Task<ActionResult<Guid>> Crear([FromBody] CrearFuncionRequest r, CancellationToken ct)
@@ -34,6 +52,7 @@ public sealed class FuncionController(IMediator mediator, IFuncionRepository rep
         return Ok(new
         {
             Id = f.Id.Value,
+            IdPelicula = f.PeliculaRef.IdPelicula,
             IdSala = f.SalaRef.IdSala,
             TipoSala = f.SalaRef.Tipo?.ToString() ?? "",
             Formato = f.Formato.Tipo.ToString(),
